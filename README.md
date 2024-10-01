@@ -1,4 +1,4 @@
-# BarrilsQuebon
+# Barils Québon
 
 ## Equipe
 - Alan Fresco
