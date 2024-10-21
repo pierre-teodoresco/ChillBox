@@ -25,7 +25,8 @@ class LofiRadioActivity : ComponentActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private val mp3List = listOf(
         R.raw.lofi_storms,
-        R.raw.pink_gaze
+        R.raw.pink_gaze,
+        R.raw.the_forbidden_secret
     )
     private var currentTrack = 0
     private var isPlaying by mutableStateOf(false) // Track playing status
@@ -57,6 +58,9 @@ class LofiRadioActivity : ComponentActivity() {
             isPlaying = true
             updateSeekBar()
         }
+        mediaPlayer?.setOnCompletionListener {
+            playNextTrack()
+        }
     }
 
     private fun togglePlayPause() {
@@ -82,6 +86,9 @@ class LofiRadioActivity : ComponentActivity() {
             player.start()
             isPlaying = true
             updateSeekBar()
+        }
+        mediaPlayer?.setOnCompletionListener {
+            playNextTrack()
         }
     }
 
