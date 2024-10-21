@@ -1,21 +1,30 @@
 package com.example.chillbox
 
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.lifecycle.lifecycleScope
 import com.example.chillbox.ui.components.BackButton
 import com.example.chillbox.ui.theme.ChillBoxTheme
 import kotlinx.coroutines.*
@@ -27,6 +36,17 @@ class LofiRadioActivity : ComponentActivity() {
         R.raw.lofi_storms,
         R.raw.pink_gaze,
         R.raw.the_forbidden_secret
+    )
+    private val songNames = listOf(
+        "Lofi Storms",
+        "Pink Gaze",
+        "The Forbidden Secret",
+        "Harsh Memories"
+    )
+    private val songImages = listOf(
+        R.drawable.lofi_storms_image,
+        R.drawable.pink_gaze_image,
+        R.drawable.the_forbidden_secret_image
     )
     private var currentTrack = 0
     private var isPlaying by mutableStateOf(false) // Track playing status
@@ -41,8 +61,11 @@ class LofiRadioActivity : ComponentActivity() {
                     isPlaying = isPlaying,
                     currentPosition = currentPosition,
                     trackDuration = trackDuration,
+                    songName = songNames[currentTrack],
+                    songImage = songImages[currentTrack],
                     onPlayPauseClicked = { togglePlayPause() },
                     onNextClicked = { playNextTrack() },
+                    onPreviousClicked = { playPreviousTrack() },
                     onSliderChanged = { seekTo(it) }
                 )
             }
@@ -54,9 +77,7 @@ class LofiRadioActivity : ComponentActivity() {
         mediaPlayer = MediaPlayer.create(this, mp3List[currentTrack])
         mediaPlayer?.setOnPreparedListener { player ->
             trackDuration = player.duration.toFloat() // Ensure this is set before any UI interaction
-            player.start()
-            isPlaying = true
-            updateSeekBar()
+            // Do not start the player automatically
         }
         mediaPlayer?.setOnCompletionListener {
             playNextTrack()
@@ -71,24 +92,58 @@ class LofiRadioActivity : ComponentActivity() {
             } else {
                 it.start()
                 isPlaying = true
+                updateSeekBar()
             }
         }
     }
 
     private fun playNextTrack() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        val wasPlaying = isPlaying
+        mediaPlayer?.reset()
 
         currentTrack = (currentTrack + 1) % mp3List.size
-        mediaPlayer = MediaPlayer.create(this, mp3List[currentTrack])
-        mediaPlayer?.setOnPreparedListener { player ->
-            trackDuration = player.duration.toFloat()
-            player.start()
-            isPlaying = true
+        mediaPlayer?.setDataSource(this, Uri.parse("android.resource://$packageName/${mp3List[currentTrack]}"))
+        mediaPlayer?.prepareAsync()
+        mediaPlayer?.setOnPreparedListener {
+            trackDuration = it.duration.toFloat()
+            if (wasPlaying) {
+                it.start()
+            }
             updateSeekBar()
         }
-        mediaPlayer?.setOnCompletionListener {
-            playNextTrack()
+        mediaPlayer?.setOnErrorListener { _, _, _ ->
+            // Handle error
+            false
+        }
+    }
+
+    private fun playPreviousTrack() {
+        val wasPlaying = isPlaying
+        val currentPosition = mediaPlayer?.currentPosition ?: 0
+        val threshold = 2000 // 2 seconds in milliseconds
+
+        if (currentPosition > threshold) {
+            // Restart the current song
+            mediaPlayer?.seekTo(0)
+            mediaPlayer?.start()
+        } else {
+            // Switch to the previous song
+            mediaPlayer?.reset()
+
+            currentTrack = if (currentTrack == 0) mp3List.size - 1 else currentTrack - 1
+            mediaPlayer?.setDataSource(this, Uri.parse("android.resource://$packageName/${mp3List[currentTrack]}"))
+            mediaPlayer?.prepareAsync()
+            mediaPlayer?.setOnPreparedListener {
+                trackDuration = it.duration.toFloat()
+                if (wasPlaying) {
+                    it.start()
+                }
+                updateSeekBar()
+            }
+            mediaPlayer?.setOnErrorListener { _, what, extra ->
+                // Handle error
+                false
+            }
         }
     }
 
@@ -96,16 +151,17 @@ class LofiRadioActivity : ComponentActivity() {
         mediaPlayer?.let {
             val newPosition = (position * trackDuration).toInt()
             it.seekTo(newPosition)
+            currentPosition = newPosition.toFloat()
         }
     }
 
     private fun updateSeekBar() {
-        GlobalScope.launch {
-            while (mediaPlayer != null) {
+        lifecycleScope.launch {
+            while (isPlaying) {
                 mediaPlayer?.let {
                     currentPosition = it.currentPosition.toFloat()
                 }
-                delay(1000L)
+                delay(200L) // Use a smaller delay for smoother updates
             }
         }
     }
@@ -122,29 +178,70 @@ fun LofiRadioScreen(
     isPlaying: Boolean,
     currentPosition: Float,
     trackDuration: Float,
+    songName: String,
+    songImage: Int,
     onPlayPauseClicked: () -> Unit,
     onNextClicked: () -> Unit,
+    onPreviousClicked: () -> Unit,
     onSliderChanged: (Float) -> Unit
 ) {
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
+    // Define scaling factor based on screen width (e.g., tablets or large devices)
+    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding((16 * scaleFactor).dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BackButton(scaleFactor = 1.0f)
+        // Reusable BackButton from the BackButton.kt file
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+            BackButton(scaleFactor = scaleFactor)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Song Image with top and bottom padding and rounded corners
+        Image(
+            painter = painterResource(id = songImage),
+            contentDescription = "Song Image",
+            modifier = Modifier
+                .size(1000.dp) // Use appropriate size
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Song Name with padding
+        Text(
+            text = songName,
+            style = androidx.compose.ui.text.TextStyle(fontSize = 25.sp),
+            modifier = Modifier.padding(vertical = 8.dp) // Adjust the padding values as needed
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Music Player Controls
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
+            IconButton(onClick = { onPreviousClicked() }) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_previous),
+                    contentDescription = "Previous Track",
+                    modifier = Modifier.size(48.dp) // Increase the size
+                )
+            }
+
             IconButton(onClick = { onPlayPauseClicked() }) {
                 Image(
                     painter = painterResource(
                         id = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
                     ),
                     contentDescription = "Play/Pause",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(48.dp) // Increase the size
                 )
             }
 
@@ -152,26 +249,88 @@ fun LofiRadioScreen(
                 Image(
                     painter = painterResource(id = R.drawable.ic_next),
                     contentDescription = "Next Track",
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(48.dp) // Increase the size
                 )
             }
         }
 
-        // Slider for Music Progress
-        Slider(
-            value = if (trackDuration > 0) currentPosition / trackDuration else 0f, // Avoid NaN by handling cases where trackDuration is 0
+        // Custom Slider for Music Progress
+        CustomSlider(
+            value = if (trackDuration > 0) currentPosition.toFloat() / trackDuration else 0f,
             onValueChange = onSliderChanged,
-            modifier = Modifier.fillMaxWidth(),
-            valueRange = 0f..1f,
-            colors = androidx.compose.material3.SliderDefaults.colors(
-                thumbColor = Color.White,
-                activeTrackColor = Color.Cyan
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 64.dp) // Adjust horizontal padding to shrink the slider
         )
 
-        // Current track time (in seconds)
-        Text(text = "Progress: ${currentPosition.toInt() / 1000}s / ${(trackDuration / 1000).toInt()}s")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 64.dp), // Adjust horizontal padding to shrink the slider
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = formatTime(currentPosition.toLong() / 1000))
+            Text(text = formatTime(trackDuration.toLong() / 1000))
+        }
     }
+}
+
+@Composable
+fun CustomSlider(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        Canvas(modifier = Modifier.fillMaxWidth().height(48.dp)) {
+            val trackHeight = 16.dp.toPx() // Increase the track height
+            val thumbRadius = 20.dp.toPx() // Increase the thumb radius
+            val trackWidth = size.width
+            val activeTrackWidth = trackWidth * value
+
+            // Draw inactive track
+            drawRoundRect(
+                color = Color.LightGray,
+                topLeft = Offset(0f, (size.height - trackHeight) / 2),
+                size = Size(trackWidth, trackHeight),
+                cornerRadius = CornerRadius(trackHeight / 2, trackHeight / 2)
+            )
+
+            // Draw active track
+            drawRoundRect(
+                color = Color(0xFF66BB6A),
+                topLeft = Offset(0f, (size.height - trackHeight) / 2),
+                size = Size(activeTrackWidth, trackHeight),
+                cornerRadius = CornerRadius(trackHeight / 2, trackHeight / 2)
+            )
+
+            // Draw thumb
+            drawCircle(
+                color = Color.Gray,
+                radius = thumbRadius,
+                center = Offset(activeTrackWidth, size.height / 2)
+            )
+        }
+
+        // Handle touch events to update the slider value
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        val newValue = offset.x / size.width
+                        onValueChange(newValue)
+                    }
+                }
+        )
+    }
+}
+
+fun formatTime(seconds: Long): String {
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return String.format("%02d:%02d", minutes, remainingSeconds)
 }
 
 @Preview(showBackground = true)
@@ -182,8 +341,11 @@ fun LofiRadioScreenPreview() {
             isPlaying = false,
             currentPosition = 0f,
             trackDuration = 100f,
+            songName = "Lofi Storms",
+            songImage = R.drawable.lofi_storms_image,
             onPlayPauseClicked = {},
             onNextClicked = {},
+            onPreviousClicked = {},
             onSliderChanged = {}
         )
     }
