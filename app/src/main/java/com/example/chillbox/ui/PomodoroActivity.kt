@@ -1,4 +1,4 @@
-package com.example.chillbox
+package com.example.chillbox.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
