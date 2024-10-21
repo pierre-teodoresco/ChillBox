@@ -1,6 +1,3 @@
-package com.example.chillbox
-
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,20 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.chillbox.R
 import com.example.chillbox.ui.theme.ChillBoxTheme
 
 class MainActivity : ComponentActivity() {
@@ -38,95 +34,108 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
+
+    // Define scaling factor based on screen width (e.g., tablets or large devices)
+    val scaleFactor = if (screenWidthDp > 600) 1.5f else 1.0f
+
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Header with a distinct background color
-        Header(modifier = Modifier.background(MaterialTheme.colorScheme.primary))
+        // Header with scaled content
+        Header(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary),
+            scaleFactor = scaleFactor
+        )
 
-        // Cards section with its own background color
-        CardsGrid(modifier = Modifier.background(MaterialTheme.colorScheme.background))
+        // Cards section with scaling
+        CardsGrid(scaleFactor = scaleFactor)
 
-        // Footer with another distinct background color
-        Footer(modifier = Modifier.background(MaterialTheme.colorScheme.primary))
+        // Footer with default size
+        Footer(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primary),
+            scaleFactor = scaleFactor
+        )
     }
 }
 
 @Composable
-fun Header(modifier: Modifier = Modifier) {
+fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 20.dp), // Reduced padding for a smaller header
+            .padding(horizontal = (16 * scaleFactor).dp, vertical = (8 * scaleFactor).dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(id = R.drawable.ic_chillbox_logo),
             contentDescription = stringResource(id = R.string.app_logo),
-            modifier = Modifier.size(80.dp) // Optionally reduce logo size if needed
+            modifier = Modifier.size((80 * scaleFactor).dp) // Scaled logo size
         )
         Text(
             text = stringResource(id = R.string.username),
-            style = MaterialTheme.typography.titleMedium, // Use a slightly smaller font
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (22 * scaleFactor).sp), // Scaled text size
             color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
 
 @Composable
-fun CardsGrid(modifier: Modifier = Modifier) {
+fun CardsGrid(scaleFactor: Float) {
     Column(
-        modifier = modifier
-            .padding(30.dp)
+        modifier = Modifier
+            .padding((30 * scaleFactor).dp)
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(50.dp)
+        verticalArrangement = Arrangement.spacedBy((70 * scaleFactor).dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.lofi_radio, R.string.lofi_radio) { /* Navigate to Lofi Radio Activity */ }
-            CardItem(R.drawable.pomodoro, R.string.pomodoro) { /* Navigate to Pomodoro Activity */ }
+            CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) { /* Navigate to Lofi Radio Activity */ }
+            CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) { /* Navigate to Pomodoro Activity */ }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.game, R.string.game) { /* Navigate to Game Activity */ }
-            CardItem(R.drawable.forum, R.string.forum) { /* Navigate to Forum Activity */ }
+            CardItem(R.drawable.game, R.string.game, scaleFactor) { /* Navigate to Game Activity */ }
+            CardItem(R.drawable.forum, R.string.forum, scaleFactor) { /* Navigate to Forum Activity */ }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.ambiance, R.string.ambiance) { /* Navigate to Ambiance Activity */ }
-            CardItem(R.drawable.cute_videos, R.string.cute_videos) { /* Navigate to Cute Videos Activity */ }
+            CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) { /* Navigate to Ambiance Activity */ }
+            CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) { /* Navigate to Cute Videos Activity */ }
         }
     }
 }
 
 @Composable
-fun CardItem(imageRes: Int, textRes: Int, onClick: () -> Unit) {
+fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(120.dp)
+            .size((120 * scaleFactor).dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp), // Rounded corners for the card
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp // Elevation for shadow effect
+            defaultElevation = (8 * scaleFactor).dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White // Background color of the card (change as per theme)
+            containerColor = Color.White
         )
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
+                .padding((8 * scaleFactor).dp)
                 .fillMaxSize(), // Ensure the column fills the card
             horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally
             verticalArrangement = Arrangement.Center // Center content vertically within the card
@@ -135,31 +144,32 @@ fun CardItem(imageRes: Int, textRes: Int, onClick: () -> Unit) {
                 painter = painterResource(id = imageRes),
                 contentDescription = stringResource(id = textRes),
                 modifier = Modifier
-                    .size(80.dp)
+                    .size((80 * scaleFactor).dp)
                     .align(Alignment.CenterHorizontally) // Ensure the image is centered
-                    .padding(8.dp)
+                    .padding((8 * scaleFactor).dp)
             )
             Text(
                 text = stringResource(id = textRes),
-                style = MaterialTheme.typography.titleMedium,
+                fontSize = (14 * scaleFactor).sp,
+                fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.CenterHorizontally) // Ensure text is centered
             )
         }
     }
 }
 
-
 @Composable
-fun Footer(modifier: Modifier = Modifier) {
+fun Footer(modifier: Modifier = Modifier, scaleFactor: Float) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding((16 * scaleFactor).dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = stringResource(id = R.string.footer),
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
