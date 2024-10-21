@@ -106,7 +106,7 @@ fun CardsGrid(scaleFactor: Float) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) {
-                // Start the PomodoroActivity on click
+                // Start the LofiRadioActivity on click
                 val intent = Intent(context, LofiRadioActivity::class.java)
                 context.startActivity(intent)
             }
@@ -120,15 +120,31 @@ fun CardsGrid(scaleFactor: Float) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.game, R.string.game, scaleFactor) { /* Navigate to Game Activity */ }
-            CardItem(R.drawable.forum, R.string.forum, scaleFactor) { /* Navigate to Forum Activity */ }
+            CardItem(R.drawable.game, R.string.game, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, GameActivity::class.java)
+                context.startActivity(intent)
+            }
+            CardItem(R.drawable.forum, R.string.forum, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, ForumActivity::class.java)
+                context.startActivity(intent)
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) { /* Navigate to Ambiance Activity */ }
-            CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) { /* Navigate to Cute Videos Activity */ }
+            CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, AmbianceActivity::class.java)
+                context.startActivity(intent)
+            }
+            CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, CuteVideosActivity::class.java)
+                context.startActivity(intent)
+            }
         }
     }
 }
