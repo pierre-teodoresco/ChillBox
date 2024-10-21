@@ -105,7 +105,11 @@ fun CardsGrid(scaleFactor: Float) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) { /* Navigate to Lofi Radio Activity */ }
+            CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, LofiRadioActivity::class.java)
+                context.startActivity(intent)
+            }
             CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) {
                 // Start the PomodoroActivity on click
                 val intent = Intent(context, PomodoroActivity::class.java)
