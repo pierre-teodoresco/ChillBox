@@ -1,24 +1,28 @@
-
 package com.example.chillbox
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.chillbox.ui.theme.ChillBoxTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,78 +30,137 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ChillBoxTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainMenu()
-                }
+                MainScreen()
             }
         }
     }
 }
 
 @Composable
-fun MainMenu() {
-    // Grid of 2 columns with multiple widgets
+fun MainScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .background(MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Row 1
+        // Header with a distinct background color
+        Header(modifier = Modifier.background(MaterialTheme.colorScheme.primary))
+
+        // Cards section with its own background color
+        CardsGrid(modifier = Modifier.background(MaterialTheme.colorScheme.background))
+
+        // Footer with another distinct background color
+        Footer(modifier = Modifier.background(MaterialTheme.colorScheme.primary))
+    }
+}
+
+@Composable
+fun Header(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp), // Reduced padding for a smaller header
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_chillbox_logo),
+            contentDescription = stringResource(id = R.string.app_logo),
+            modifier = Modifier.size(80.dp) // Optionally reduce logo size if needed
+        )
+        Text(
+            text = stringResource(id = R.string.username),
+            style = MaterialTheme.typography.titleMedium, // Use a slightly smaller font
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+    }
+}
+
+@Composable
+fun CardsGrid(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .padding(30.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(50.dp)
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            MenuBox("Lofi Radio", Color.Blue) {
-                // Prepare for Intent to Lofi Radio Activity
-            }
-            MenuBox("Pomodoro Timer", Color.Green) {
-                // Prepare for Intent to Pomodoro Timer Activity
-            }
+            CardItem(R.drawable.lofi_radio, R.string.lofi_radio) { /* Navigate to Lofi Radio Activity */ }
+            CardItem(R.drawable.pomodoro, R.string.pomodoro) { /* Navigate to Pomodoro Activity */ }
         }
-        // Row 2
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            MenuBox("Meditation", Color.Cyan) {
-                // Prepare for Intent to Meditation Activity
-            }
-            MenuBox("Animal Videos", Color.Magenta) {
-                // Prepare for Intent to Animal Videos Activity
-            }
+            CardItem(R.drawable.game, R.string.game) { /* Navigate to Game Activity */ }
+            CardItem(R.drawable.forum, R.string.forum) { /* Navigate to Forum Activity */ }
         }
-        // Row 3
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            MenuBox("RGB Palette", Color.Yellow) {
-                // Prepare for Intent to RGB Palette Game Activity
-            }
+            CardItem(R.drawable.ambiance, R.string.ambiance) { /* Navigate to Ambiance Activity */ }
+            CardItem(R.drawable.cute_videos, R.string.cute_videos) { /* Navigate to Cute Videos Activity */ }
         }
     }
 }
 
 @Composable
-fun MenuBox(label: String, color: Color, onClick: () -> Unit) {
+fun CardItem(imageRes: Int, textRes: Int, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .size(150.dp)
-            .clickable { onClick() }
-            .background(color),
-        shape = RoundedCornerShape(16.dp),
+            .size(120.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp), // Rounded corners for the card
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp // Elevation for shadow effect
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White // Background color of the card (change as per theme)
+        )
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxSize(), // Ensure the column fills the card
+            horizontalAlignment = Alignment.CenterHorizontally, // Center content horizontally
+            verticalArrangement = Arrangement.Center // Center content vertically within the card
         ) {
-            BasicText(text = label, style = MaterialTheme.typography.titleMedium)
+            Image(
+                painter = painterResource(id = imageRes),
+                contentDescription = stringResource(id = textRes),
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.CenterHorizontally) // Ensure the image is centered
+                    .padding(8.dp)
+            )
+            Text(
+                text = stringResource(id = textRes),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.CenterHorizontally) // Ensure text is centered
+            )
         }
+    }
+}
+
+
+@Composable
+fun Footer(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.footer),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -105,6 +168,6 @@ fun MenuBox(label: String, color: Color, onClick: () -> Unit) {
 @Composable
 fun MainMenuPreview() {
     ChillBoxTheme {
-        MainMenu()
+        MainScreen()
     }
 }
