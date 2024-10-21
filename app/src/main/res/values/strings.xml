@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">ChillBox</string>
+    <string name="app_logo">ChillBox Logo</string>
+    <string name="username">John Doe</string>
+    <string name="lofi_radio">Lofi Radio</string>
+    <string name="pomodoro">Pomodoro</string>
+    <string name="game">Game</string>
+    <string name="forum">Forum</string>
+    <string name="ambiance">Ambiance</string>
+    <string name="cute_videos">Cute Videos</string>
+    <string name="footer">Barils Québon Inc. 2024</string>
+</resources>
