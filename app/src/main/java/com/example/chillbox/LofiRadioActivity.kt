@@ -35,18 +35,20 @@ class LofiRadioActivity : ComponentActivity() {
     private val mp3List = listOf(
         R.raw.lofi_storms,
         R.raw.pink_gaze,
-        R.raw.the_forbidden_secret
+        R.raw.the_forbidden_secret,
+        R.raw.an_outlandish_dream
     )
     private val songNames = listOf(
         "Lofi Storms",
         "Pink Gaze",
         "The Forbidden Secret",
-        "Harsh Memories"
+        "An Outlandish Dream"
     )
     private val songImages = listOf(
         R.drawable.lofi_storms_image,
         R.drawable.pink_gaze_image,
-        R.drawable.the_forbidden_secret_image
+        R.drawable.the_forbidden_secret_image,
+        R.drawable.an_outlandish_dream_image
     )
     private var currentTrack = 0
     private var isPlaying by mutableStateOf(false) // Track playing status
