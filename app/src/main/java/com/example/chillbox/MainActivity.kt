@@ -1,5 +1,6 @@
 package com.example.chillbox
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +42,7 @@ fun MainScreen() {
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 1.5f else 1.0f
+    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
 
     Column(
         modifier = Modifier
@@ -91,6 +93,8 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
 
 @Composable
 fun CardsGrid(scaleFactor: Float) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .padding((30 * scaleFactor).dp)
@@ -102,7 +106,11 @@ fun CardsGrid(scaleFactor: Float) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) { /* Navigate to Lofi Radio Activity */ }
-            CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) { /* Navigate to Pomodoro Activity */ }
+            CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) {
+                // Start the PomodoroActivity on click
+                val intent = Intent(context, PomodoroActivity::class.java)
+                context.startActivity(intent)
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
