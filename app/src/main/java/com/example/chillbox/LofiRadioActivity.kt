@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -252,13 +253,13 @@ fun LofiRadioScreen(
             }
         }
 
-        // Custom Slider for Music Progress
-        CustomSlider(
-            value = if (trackDuration > 0) currentPosition.toFloat() / trackDuration else 0f,
+        // Slider for Music Progress
+        Slider(
+            value = if (trackDuration > 0) currentPosition / trackDuration else 0f,
             onValueChange = onSliderChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = (32 * scaleFactor).dp) // Adjust horizontal padding to shrink the slider
+                .padding(horizontal = (32 * scaleFactor).dp)
         )
 
         Row(
