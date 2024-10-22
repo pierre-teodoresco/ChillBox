@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -173,8 +174,88 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                     modifier = Modifier.size((24 * scaleFactor).dp)
                 )
             }
+
+            // Skip button
+            IconButton(
+                onClick = { viewModel.skipSession() }, // Skip the current session
+                modifier = Modifier.padding((8 * scaleFactor).dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_next),
+                    contentDescription = "Skip",
+                    modifier = Modifier.size((24 * scaleFactor).dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+
+        // Sliders for Work Session Length and Rest Session Length
+        Column {
+            // Work Session Length
+            Text(
+                text = "Work Session Length: ${viewModel.workSessionLength} minutes",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
+            )
+            Slider(
+                value = viewModel.workSessionLength,
+                onValueChange = { viewModel.workSessionLength = it.toInt().toFloat() },
+                valueRange = 1f..60f,
+                steps = 59,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+
+            // Short Rest Session Length
+            Text(
+                text = "Rest Session Length: ${viewModel.shortRestSessionLength} minutes",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
+            )
+            Slider(
+                value = viewModel.shortRestSessionLength,
+                onValueChange = { viewModel.shortRestSessionLength = it.toInt().toFloat() },
+                valueRange = 1f..60f,
+                steps = 59,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+
+            // Long Rest Session Length
+            Text(
+                text = "Long Rest Session Length: ${viewModel.longRestSessionLength} minutes",
+                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
+            )
+            Slider(
+                value = viewModel.longRestSessionLength,
+                onValueChange = { viewModel.longRestSessionLength = it.toInt().toFloat() },
+                valueRange = 1f..60f,
+                steps = 59,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
+}
+
+@Composable
+fun SessionLengthSlider(
+    label: String,
+    length: Float,
+    onValueChange: (Float) -> Unit,
+    scaleFactor: Float
+) {
+    Text(
+        text = "$label: ${length.toInt()} minutes",
+        style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
+    )
+    Slider(
+        value = length,
+        onValueChange = onValueChange,
+        valueRange = 1f..60f,
+        modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
+    )
+
 }
 
 @Preview(showBackground = true)

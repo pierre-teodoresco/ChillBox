@@ -6,13 +6,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.chillbox.model.PomodoroSessionType
+import com.example.chillbox.model.TimeManager
 
 class PomodoroViewModel : ViewModel() {
 
     // Customization attributes (now using Float for flexibility)
-    val workSessionLength = 0.1f // 0.1 minutes = 6 seconds (for testing)
-    val shortRestSessionLength = 0.1f // 0.1 minutes = 6 seconds
-    val longRestSessionLength = 0.2f // 0.5 minutes = 12 seconds
+    var workSessionLength = 0.1f // 0.1 minutes = 6 seconds (for testing)
+    var shortRestSessionLength = 0.1f // 0.1 minutes = 6 seconds
+    var longRestSessionLength = 0.2f // 0.5 minutes = 12 seconds
 
     private var currentTimeInMillis = (workSessionLength * 60 * 1000L).toLong() // Default work session in milliseconds
 
@@ -60,6 +61,13 @@ class PomodoroViewModel : ViewModel() {
         updateTimerDisplay()
     }
 
+    // Skip the current session
+    fun skipSession() {
+        pauseTimer()
+        switchSession()
+        updateTimerDisplay()
+    }
+
     // Switch between sessions
     private fun switchSession() {
         // Safely increment the work session count only when in Work session
@@ -91,10 +99,7 @@ class PomodoroViewModel : ViewModel() {
     }
 
     // Update timer display in MM:SS format
-    @SuppressLint("DefaultLocale")
     private fun updateTimerDisplay() {
-        val minutes = (currentTimeInMillis / 1000) / 60
-        val seconds = (currentTimeInMillis / 1000) % 60
-        timerValue.value = String.format("%02d:%02d", minutes, seconds)
+        timerValue.value = TimeManager.formatTime(currentTimeInMillis / 1000)
     }
 }
