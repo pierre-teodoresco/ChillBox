@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -61,11 +61,16 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
     // Define scaling factor based on screen width (e.g., tablets or large devices)
     val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
 
-    // Get the current session type and timer value
+    // LiveData to observe session type, timer value, and timer state
     val currentSession by viewModel.currentSession.observeAsState(PomodoroSessionType.Work)
     val timerValue by viewModel.timerValue.observeAsState("00:00")
     val isTimerRunning by viewModel.isTimerRunning.observeAsState(false)
     val workSessionCount by viewModel.workSessionCount.observeAsState(0)
+
+    // LiveData to observe session length values
+    val workSessionLength by viewModel.workSessionLength.observeAsState(20)
+    val shortRestSessionLength by viewModel.shortRestSessionLength.observeAsState(5)
+    val longRestSessionLength by viewModel.longRestSessionLength.observeAsState(30)
 
     // Background color based on session type
     val backgroundColor = when (currentSession) {
@@ -85,7 +90,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             BackButton(scaleFactor = scaleFactor)
         }
 
-        Spacer(modifier = Modifier.height((275 * scaleFactor).dp))
+        Spacer(modifier = Modifier.height((150 * scaleFactor).dp))
 
         // Session Type Display (Work Session, Rest Session, Long Rest Session)
         Text(
@@ -95,7 +100,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                 PomodoroSessionType.LongRest -> "Long Rest Session"
                 else -> "Work Session"
             },
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp)
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (32 * scaleFactor).sp)
         )
 
         Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
@@ -103,11 +108,11 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
         // Timer Display (Minutes:Seconds)
         Text(
             text = timerValue, // Display timer value as MM:SS
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp),
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (64 * scaleFactor).sp),
             fontWeight = FontWeight.Bold,
         )
 
-        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+        Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
 
         // Progress Indicator
         Row(
@@ -123,9 +128,8 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                 Spacer(
                     modifier = Modifier
                         .height((8 * scaleFactor).dp)
-                        .width((20 * scaleFactor).dp)
+                        .width((32 * scaleFactor).dp)
                         .background(color)
-                        .padding((4 * scaleFactor).dp)
                 )
             }
         }
@@ -146,7 +150,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                     Icon(
                         painter = painterResource(R.drawable.ic_pause),
                         contentDescription = "Pause",
-                        modifier = Modifier.size((24 * scaleFactor).dp)
+                        modifier = Modifier.size((32 * scaleFactor).dp)
                     )
                 }
             } else {
@@ -157,7 +161,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                     Icon(
                         painter = painterResource(R.drawable.ic_play),
                         contentDescription = "Play",
-                        modifier = Modifier.size((24 * scaleFactor).dp)
+                        modifier = Modifier.size((32 * scaleFactor).dp)
                     )
                 }
             }
@@ -170,11 +174,76 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                 Icon(
                     painter = painterResource(R.drawable.ic_reset),
                     contentDescription = "Reset",
-                    modifier = Modifier.size((24 * scaleFactor).dp)
+                    modifier = Modifier.size((32 * scaleFactor).dp)
+                )
+            }
+
+            // Skip button
+            IconButton(
+                onClick = { viewModel.skipSession() }, // Skip the current session
+                modifier = Modifier.padding((8 * scaleFactor).dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_next),
+                    contentDescription = "Skip",
+                    modifier = Modifier.size((32 * scaleFactor).dp)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+
+        // Sliders for Work Session Length and Rest Session Length
+        Column {
+            // Work Session Length
+            SessionLengthSlider(
+                label = "Work",
+                length = workSessionLength,
+                onValueChange = { viewModel.setWorkSessionLength(it.toInt()) },
+                scaleFactor = scaleFactor
+            )
+
+            Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
+
+            // Short Rest Session Length
+            SessionLengthSlider(
+                label = "Short Rest",
+                length = shortRestSessionLength,
+                onValueChange = { viewModel.setShortRestSessionLength(it.toInt()) },
+                scaleFactor = scaleFactor
+            )
+
+            Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
+
+            // Long Rest Session Length
+            SessionLengthSlider(
+                label = "Long Rest",
+                length = longRestSessionLength,
+                onValueChange = { viewModel.setLongRestSessionLength(it.toInt()) },
+                scaleFactor = scaleFactor
+            )
+        }
     }
+}
+
+@Composable
+fun SessionLengthSlider(
+    label: String,
+    length: Int,
+    onValueChange: (Float) -> Unit,
+    scaleFactor: Float
+) {
+    Text(
+        text = "$label: $length minutes",
+        style = MaterialTheme.typography.bodyMedium.copy(fontSize = (24 * scaleFactor).sp),
+        modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
+    )
+    Slider(
+        value = length.toFloat(),
+        onValueChange = onValueChange,
+        valueRange = 1f..60f,
+        modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
+    )
 }
 
 @Preview(showBackground = true)
