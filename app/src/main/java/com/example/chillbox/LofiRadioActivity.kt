@@ -267,8 +267,8 @@ fun LofiRadioScreen(
                 .padding(horizontal = (32 * scaleFactor).dp), // Adjust horizontal padding to shrink the slider
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = TimeManager.formatTime(currentPosition.toLong() / 1000))
-            Text(text = TimeManager.formatTime(trackDuration.toLong() / 1000))
+            Text(text = TimeManager.formatTime(currentPosition.toInt() / 1000))
+            Text(text = TimeManager.formatTime(trackDuration.toInt() / 1000))
         }
     }
 }

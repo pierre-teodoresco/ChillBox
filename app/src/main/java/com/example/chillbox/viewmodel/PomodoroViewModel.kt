@@ -1,6 +1,5 @@
 package com.example.chillbox.viewmodel
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,7 +14,7 @@ class PomodoroViewModel : ViewModel() {
     var shortRestSessionLength = 0.1f // 0.1 minutes = 6 seconds
     var longRestSessionLength = 0.2f // 0.5 minutes = 12 seconds
 
-    private var currentTimeInMillis = (workSessionLength * 60 * 1000L).toLong() // Default work session in milliseconds
+    private var currentTimeInMillis = workSessionLength * 60 * 1000 // Default work session in milliseconds
 
     private var timerJob: Job? = null
 
@@ -57,7 +56,7 @@ class PomodoroViewModel : ViewModel() {
         currentSession.value = PomodoroSessionType.Work
         workSessionCount.value = 0
         isTimerRunning.value = false
-        currentTimeInMillis = (workSessionLength * 60 * 1000L).toLong()
+        currentTimeInMillis = workSessionLength * 60 * 1000
         updateTimerDisplay()
     }
 
@@ -90,10 +89,10 @@ class PomodoroViewModel : ViewModel() {
 
         // Update the timer value based on the next session
         currentTimeInMillis = when (currentSession.value) {
-            PomodoroSessionType.Work -> (workSessionLength * 60 * 1000L).toLong()
-            PomodoroSessionType.Rest -> (shortRestSessionLength * 60 * 1000L).toLong()
-            PomodoroSessionType.LongRest -> (longRestSessionLength * 60 * 1000L).toLong()
-            null -> (workSessionLength * 60 * 1000L).toLong()
+            PomodoroSessionType.Work -> (workSessionLength * 60 * 1000)
+            PomodoroSessionType.Rest -> (shortRestSessionLength * 60 * 1000)
+            PomodoroSessionType.LongRest -> (longRestSessionLength * 60 * 1000)
+            null -> (workSessionLength * 60 * 1000)
         }
         startTimer() // Automatically start next session
     }

@@ -62,7 +62,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
     // Define scaling factor based on screen width (e.g., tablets or large devices)
     val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
 
-    // Get the current session type and timer value
+    // LiveData to observe session type, timer value, and timer state
     val currentSession by viewModel.currentSession.observeAsState(PomodoroSessionType.Work)
     val timerValue by viewModel.timerValue.observeAsState("00:00")
     val isTimerRunning by viewModel.isTimerRunning.observeAsState(false)
@@ -193,46 +193,31 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
         // Sliders for Work Session Length and Rest Session Length
         Column {
             // Work Session Length
-            Text(
-                text = "Work Session Length: ${viewModel.workSessionLength} minutes",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
-            )
-            Slider(
-                value = viewModel.workSessionLength,
-                onValueChange = { viewModel.workSessionLength = it.toInt().toFloat() },
-                valueRange = 1f..60f,
-                steps = 59,
-                modifier = Modifier.fillMaxWidth()
+            SessionLengthSlider(
+                label = "Work Session Length",
+                length = viewModel.workSessionLength,
+                onValueChange = { viewModel.workSessionLength = it },
+                scaleFactor = scaleFactor
             )
 
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
             // Short Rest Session Length
-            Text(
-                text = "Rest Session Length: ${viewModel.shortRestSessionLength} minutes",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
-            )
-            Slider(
-                value = viewModel.shortRestSessionLength,
-                onValueChange = { viewModel.shortRestSessionLength = it.toInt().toFloat() },
-                valueRange = 1f..60f,
-                steps = 59,
-                modifier = Modifier.fillMaxWidth()
+            SessionLengthSlider(
+                label = "Short Rest Session Length",
+                length = viewModel.shortRestSessionLength,
+                onValueChange = { viewModel.shortRestSessionLength = it },
+                scaleFactor = scaleFactor
             )
 
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
             // Long Rest Session Length
-            Text(
-                text = "Long Rest Session Length: ${viewModel.longRestSessionLength} minutes",
-                style = MaterialTheme.typography.bodyMedium.copy(fontSize = (16 * scaleFactor).sp)
-            )
-            Slider(
-                value = viewModel.longRestSessionLength,
-                onValueChange = { viewModel.longRestSessionLength = it.toInt().toFloat() },
-                valueRange = 1f..60f,
-                steps = 59,
-                modifier = Modifier.fillMaxWidth()
+            SessionLengthSlider(
+                label = "Long Rest Session Length",
+                length = viewModel.longRestSessionLength,
+                onValueChange = { viewModel.longRestSessionLength = it },
+                scaleFactor = scaleFactor
             )
         }
     }
@@ -255,7 +240,6 @@ fun SessionLengthSlider(
         valueRange = 1f..60f,
         modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
     )
-
 }
 
 @Preview(showBackground = true)
