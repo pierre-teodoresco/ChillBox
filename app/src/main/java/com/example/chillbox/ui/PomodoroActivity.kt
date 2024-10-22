@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.chillbox.R
 import com.example.chillbox.model.PomodoroSessionType
 import com.example.chillbox.ui.components.BackButton
@@ -84,7 +85,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             BackButton(scaleFactor = scaleFactor)
         }
 
-        Spacer(modifier = Modifier.height((300 * scaleFactor).dp))
+        Spacer(modifier = Modifier.height((275 * scaleFactor).dp))
 
         // Session Type Display (Work Session, Rest Session, Long Rest Session)
         Text(
@@ -94,7 +95,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
                 PomodoroSessionType.LongRest -> "Long Rest Session"
                 else -> "Work Session"
             },
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp)
         )
 
         Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
@@ -102,7 +103,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
         // Timer Display (Minutes:Seconds)
         Text(
             text = timerValue, // Display timer value as MM:SS
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp),
             fontWeight = FontWeight.Bold,
         )
 
