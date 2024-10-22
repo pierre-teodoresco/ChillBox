@@ -22,8 +22,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.chillbox.R
+import com.example.chillbox.ui.PomodoroActivity
 import com.example.chillbox.ui.theme.ChillBoxTheme
+import com.example.chillbox.viewmodel.PomodoroViewModel
+import androidx.activity.viewModels
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

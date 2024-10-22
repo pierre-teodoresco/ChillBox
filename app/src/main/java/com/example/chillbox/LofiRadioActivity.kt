@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -203,26 +204,26 @@ fun LofiRadioScreen(
             BackButton(scaleFactor = scaleFactor)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
         // Song Image with top and bottom padding and rounded corners
         Image(
             painter = painterResource(id = songImage),
             contentDescription = "Song Image",
             modifier = Modifier
-                .size(1000.dp) // Use appropriate size
+                .size((500 * scaleFactor).dp) // Use appropriate size
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
         // Song Name with padding
         Text(
             text = songName,
-            style = androidx.compose.ui.text.TextStyle(fontSize = 25.sp),
-            modifier = Modifier.padding(vertical = 8.dp) // Adjust the padding values as needed
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp),
+            modifier = Modifier.padding(vertical = (8 * scaleFactor).dp) // Adjust the padding values as needed
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
         // Music Player Controls
         Row(
@@ -233,7 +234,7 @@ fun LofiRadioScreen(
                 Image(
                     painter = painterResource(id = R.drawable.ic_previous),
                     contentDescription = "Previous Track",
-                    modifier = Modifier.size(48.dp) // Increase the size
+                    modifier = Modifier.size((24 * scaleFactor).dp) // Increase the size
                 )
             }
 
@@ -243,7 +244,7 @@ fun LofiRadioScreen(
                         id = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
                     ),
                     contentDescription = "Play/Pause",
-                    modifier = Modifier.size(48.dp) // Increase the size
+                    modifier = Modifier.size((24 * scaleFactor).dp) // Increase the size
                 )
             }
 
@@ -251,7 +252,7 @@ fun LofiRadioScreen(
                 Image(
                     painter = painterResource(id = R.drawable.ic_next),
                     contentDescription = "Next Track",
-                    modifier = Modifier.size(48.dp) // Increase the size
+                    modifier = Modifier.size((24 * scaleFactor).dp) // Increase the size
                 )
             }
         }
@@ -262,13 +263,13 @@ fun LofiRadioScreen(
             onValueChange = onSliderChanged,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 64.dp) // Adjust horizontal padding to shrink the slider
+                .padding(horizontal = (32 * scaleFactor).dp) // Adjust horizontal padding to shrink the slider
         )
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 64.dp), // Adjust horizontal padding to shrink the slider
+                .padding(horizontal = (32 * scaleFactor).dp), // Adjust horizontal padding to shrink the slider
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = formatTime(currentPosition.toLong() / 1000))
