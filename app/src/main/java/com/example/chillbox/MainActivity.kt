@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chillbox.ui.PomodoroActivity
 import com.example.chillbox.ui.theme.ChillBoxTheme
-import com.example.chillbox.viewmodel.PomodoroViewModel
-import androidx.activity.viewModels
+import com.example.chillbox.ui.LofiRadioActivity
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.PomodoroActivity" />
-        <activity android:name=".LofiRadioActivity" />
+        <activity android:name=".ui.LofiRadioActivity" />
         <activity android:name=".GameActivity" />
         <activity android:name=".ForumActivity" />
         <activity android:name=".AmbianceActivity" />
