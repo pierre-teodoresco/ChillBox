@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -12,6 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -48,9 +52,6 @@ fun AmbianceScreen() {
         // Reusable BackButton from the BackButton.kt file
         BackButton(scaleFactor = scaleFactor)
 
-        // Placeholder text for Ambiance Screen
-        Text(text = "Ambiance Screen", modifier = Modifier.padding(top = (16 * scaleFactor).dp))
-
         // Display the interactive image
         InteractiveImage(
             modifier = Modifier.fillMaxSize()
@@ -67,56 +68,101 @@ fun InteractiveImage(modifier: Modifier = Modifier) {
     val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
     val context = LocalContext.current
 
-    Image(
-        painter = painterResource(id = imageRes),
-        contentDescription = "Island with interactive regions",
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures { offset ->
-                val clickedRegion = detectClickedRegion(offset)
+    // Debug flag to show interactive areas
+    var showDebug by remember { mutableStateOf(true) }
 
-                // Play the corresponding sound or change the image
-                when (clickedRegion) {
-                    "temple" -> {
-                        playSound(context, mediaPlayer, R.raw.temple)
-                    }
-                    "waterfall" -> {
-                        playSound(context, mediaPlayer, R.raw.waterfall)
-                    }
-                    "forest" -> {
-                        playSound(context, mediaPlayer, R.raw.forest)
-                    }
-                    "beach" -> {
-                        playSound(context, mediaPlayer, R.raw.beach)
-                    }
-                    "boat" -> {
-                        imageRes = R.drawable.mountain // Replace with the ID of the new image
+    // Define interactive regions for each image
+    val interactiveRegions = remember {
+        mutableStateMapOf(
+            R.drawable.island_true to listOf(
+                Region("temple", 600f..775f, 500f..825f),
+                Region("waterfall", 275f..400f, 725f..925f),
+                Region("forest", 425f..550f, 500f..750f),
+                Region("beach", 200f..500f, 1150f..1275f),
+                Region("boat", 580f..675f, 1250f..1325f)
+            ),
+            R.drawable.mountain to listOf(
+                Region("mountain_peak", 300f..400f, 100f..200f),
+                Region("mountain_base", 200f..300f, 300f..400f)
+            )
+        )
+    }
+
+    Box(modifier = modifier) {
+        Image(
+            painter = painterResource(id = imageRes),
+            contentDescription = "Island with interactive regions",
+            modifier = Modifier
+                .fillMaxSize() // Make the image fill the available space
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        val clickedRegion = detectClickedRegion(offset, interactiveRegions[imageRes] ?: emptyList())
+
+                        // Play the corresponding sound or change the image
+                        when (clickedRegion) {
+                            "temple" -> {
+                                playSound(context, mediaPlayer, R.raw.temple)
+                            }
+                            "waterfall" -> {
+                                playSound(context, mediaPlayer, R.raw.waterfall)
+                            }
+                            "forest" -> {
+                                playSound(context, mediaPlayer, R.raw.forest)
+                            }
+                            "beach" -> {
+                                playSound(context, mediaPlayer, R.raw.beach)
+                            }
+                            "boat" -> {
+                                imageRes = R.drawable.mountain // Replace with the ID of the new image
+                            }
+                            "mountain_peak" -> {
+                                playSound(context, mediaPlayer, R.raw.forest)
+                            }
+                            "mountain_base" -> {
+                                imageRes = R.drawable.island_true
+                            }
+                        }
                     }
                 }
+        )
+
+        if (showDebug) {
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                drawInteractiveAreas(interactiveRegions[imageRes] ?: emptyList())
             }
         }
-    )
+    }
 }
 
 // Helper function to detect the clicked region
-fun detectClickedRegion(offset: Offset): String {
+fun detectClickedRegion(offset: Offset, regions: List<Region>): String {
     // Define specific areas for each interactive region based on the image dimensions
-    return when {
-        offset.x in 100f..200f && offset.y in 150f..250f -> "temple"      // Adjust coordinates
-        offset.x in 50f..150f && offset.y in 300f..400f -> "waterfall"   // Adjust coordinates
-        offset.x in 200f..300f && offset.y in 350f..450f -> "forest"      // Adjust coordinates
-        offset.x in 300f..400f && offset.y in 450f..550f -> "beach"       // Adjust coordinates
-        offset.x in 350f..450f && offset.y in 500f..600f -> "boat"        // Adjust coordinates
-        // Else debug message
-        else -> ""
-    }
+    return regions.find { region ->
+        offset.x in region.xRange && offset.y in region.yRange
+    }?.name ?: ""
 }
 
 // Helper function to play a sound
 fun playSound(context: Context, mediaPlayer: MutableState<MediaPlayer?>, soundResId: Int) {
     mediaPlayer.value?.release()  // Release any existing MediaPlayer instance
     mediaPlayer.value = MediaPlayer.create(context, soundResId)
+    mediaPlayer.value?.isLooping = true  // Set looping to true
     mediaPlayer.value?.start()
 }
+
+// Draw interactive areas for debugging purposes
+fun DrawScope.drawInteractiveAreas(regions: List<Region>) {
+    regions.forEach { region ->
+        drawRect(
+            color = Color.Red,
+            topLeft = Offset(region.xRange.start, region.yRange.start),
+            size = androidx.compose.ui.geometry.Size(region.xRange.endInclusive - region.xRange.start, region.yRange.endInclusive - region.yRange.start),
+            style = Stroke(width = 5f)
+        )
+    }
+}
+
+data class Region(val name: String, val xRange: ClosedFloatingPointRange<Float>, val yRange: ClosedFloatingPointRange<Float>)
 
 @Preview(showBackground = true)
 @Composable
