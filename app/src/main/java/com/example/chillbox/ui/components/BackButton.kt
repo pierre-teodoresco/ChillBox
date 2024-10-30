@@ -15,13 +15,16 @@ import androidx.navigation.NavController
 @Composable
 fun BackButton(
     navController: NavController,
-    destination: String = "home",
+    exitTask: () -> Unit = {},
     scaleFactor: Float,
     modifier: Modifier = Modifier
 ) {
     // IconButton with an arrow back icon
     IconButton(
-        onClick = { navController.navigate(destination) },
+        onClick = {
+            exitTask()
+            navController.popBackStack()
+        },
         modifier = modifier.size((48 * scaleFactor).dp)
     ) {
         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")

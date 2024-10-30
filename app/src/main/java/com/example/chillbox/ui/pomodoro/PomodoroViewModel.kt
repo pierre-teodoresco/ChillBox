@@ -1,23 +1,21 @@
-package com.example.chillbox.viewmodel
+package com.example.chillbox.ui.pomodoro
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.example.chillbox.model.PomodoroSessionType
-import com.example.chillbox.model.PomodoroState
-import com.example.chillbox.model.TimeManager
+import com.example.chillbox.utils.TimeManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class PomodoroViewModel : ViewModel() {
-    private val _state = MutableStateFlow(PomodoroState())
-    val state: StateFlow<PomodoroState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(PomodoroUiState())
+    val state: StateFlow<PomodoroUiState> = _state.asStateFlow()
 
     private var currentTimeInSeconds = _state.value.workSessionLength * 60
-    private var timerJob: Job? = null
+    private lateinit var timerJob: Job
 
     // Set the work session length
     fun setWorkSessionLength(minutes: Int) {
@@ -65,7 +63,7 @@ class PomodoroViewModel : ViewModel() {
     // Pause the timer
     fun pauseTimer() {
         _state.update { it.copy(isTimerRunning = false) }
-        timerJob?.cancel()
+        timerJob.cancel()
     }
 
     // Reset the timer to the first work session

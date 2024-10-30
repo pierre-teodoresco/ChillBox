@@ -12,8 +12,8 @@ import com.example.chillbox.ui.AmbianceScreen
 import com.example.chillbox.ui.CuteVideosScreen
 import com.example.chillbox.ui.GameScreen
 import com.example.chillbox.ui.HomeScreen
-import com.example.chillbox.ui.LofiRadioScreen
-import com.example.chillbox.ui.PomodoroScreen
+import com.example.chillbox.ui.lofiradio.LofiRadioScreen
+import com.example.chillbox.ui.pomodoro.PomodoroScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.example.chillbox.ui
+package com.example.chillbox.ui.pomodoro
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,9 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chillbox.R
-import com.example.chillbox.model.PomodoroSessionType
 import com.example.chillbox.ui.components.BackButton
-import com.example.chillbox.viewmodel.PomodoroViewModel
 
 @Composable
 fun PomodoroScreen(
