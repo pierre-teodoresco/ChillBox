@@ -5,6 +5,11 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -61,17 +66,11 @@ fun AmbianceScreen() {
 
 @Composable
 fun InteractiveImage(modifier: Modifier = Modifier) {
-    // This will hold the current image shown
     var imageRes by remember { mutableStateOf(R.drawable.island_true) }
-
-    // Load sounds (ensure they are in res/raw folder)
     val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
     val context = LocalContext.current
-
-    // Debug flag to show interactive areas
     var showDebug by remember { mutableStateOf(true) }
 
-    // Define interactive regions for each image
     val interactiveRegions = remember {
         mutableStateMapOf(
             R.drawable.island_true to listOf(
@@ -93,43 +92,64 @@ fun InteractiveImage(modifier: Modifier = Modifier) {
             painter = painterResource(id = imageRes),
             contentDescription = "Island with interactive regions",
             modifier = Modifier
-                .fillMaxSize() // Make the image fill the available space
+                .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
                         val clickedRegion = detectClickedRegion(offset, interactiveRegions[imageRes] ?: emptyList())
 
-                        // Play the corresponding sound or change the image
                         when (clickedRegion) {
-                            "temple" -> {
-                                playSound(context, mediaPlayer, R.raw.temple)
-                            }
-                            "waterfall" -> {
-                                playSound(context, mediaPlayer, R.raw.waterfall)
-                            }
-                            "forest" -> {
-                                playSound(context, mediaPlayer, R.raw.forest)
-                            }
-                            "beach" -> {
-                                playSound(context, mediaPlayer, R.raw.beach)
-                            }
-                            "boat" -> {
-                                imageRes = R.drawable.mountain // Replace with the ID of the new image
-                            }
-                            "mountain_peak" -> {
-                                playSound(context, mediaPlayer, R.raw.forest)
-                            }
-                            "mountain_base" -> {
-                                imageRes = R.drawable.island_true
-                            }
+                            "temple" -> playSound(context, mediaPlayer, R.raw.temple)
+                            "waterfall" -> playSound(context, mediaPlayer, R.raw.waterfall)
+                            "forest" -> playSound(context, mediaPlayer, R.raw.forest)
+                            "beach" -> playSound(context, mediaPlayer, R.raw.beach)
+                            "boat" -> imageRes = R.drawable.mountain
+                            "mountain_peak" -> playSound(context, mediaPlayer, R.raw.forest)
+                            "mountain_base" -> imageRes = R.drawable.island_true
                         }
                     }
                 }
         )
 
         if (showDebug) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                drawInteractiveAreas(interactiveRegions[imageRes] ?: emptyList())
-            }
+            AnimatedInteractiveAreas(interactiveRegions[imageRes] ?: emptyList())
+        }
+    }
+}
+
+@Composable
+fun AnimatedInteractiveAreas(regions: List<Region>) {
+    val alpha by animateFloatAsState(
+        targetValue = 0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    val strokeWidth by animateFloatAsState(
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    // Log the animation values to ensure they are changing
+    LaunchedEffect(alpha, strokeWidth) {
+        println("Alpha: $alpha, StrokeWidth: $strokeWidth")
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        regions.forEach { region ->
+            drawOval(
+                color = Color.Blue.copy(alpha = alpha),
+                topLeft = Offset(region.xRange.start, region.yRange.start),
+                size = androidx.compose.ui.geometry.Size(
+                    region.xRange.endInclusive - region.xRange.start,
+                    region.yRange.endInclusive - region.yRange.start
+                ),
+                style = Stroke(width = strokeWidth)
+            )
         }
     }
 }
@@ -148,18 +168,6 @@ fun playSound(context: Context, mediaPlayer: MutableState<MediaPlayer?>, soundRe
     mediaPlayer.value = MediaPlayer.create(context, soundResId)
     mediaPlayer.value?.isLooping = true  // Set looping to true
     mediaPlayer.value?.start()
-}
-
-// Draw interactive areas for debugging purposes
-fun DrawScope.drawInteractiveAreas(regions: List<Region>) {
-    regions.forEach { region ->
-        drawRect(
-            color = Color.Red,
-            topLeft = Offset(region.xRange.start, region.yRange.start),
-            size = androidx.compose.ui.geometry.Size(region.xRange.endInclusive - region.xRange.start, region.yRange.endInclusive - region.yRange.start),
-            style = Stroke(width = 5f)
-        )
-    }
 }
 
 data class Region(val name: String, val xRange: ClosedFloatingPointRange<Float>, val yRange: ClosedFloatingPointRange<Float>)
