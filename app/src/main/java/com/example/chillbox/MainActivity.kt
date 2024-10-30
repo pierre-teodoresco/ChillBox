@@ -13,12 +13,15 @@ import com.example.chillbox.ui.HomeScreen
 import com.example.chillbox.ui.colorpicker.ColorPickerScreen
 import com.example.chillbox.ui.lofiradio.LofiRadioScreen
 import com.example.chillbox.ui.pomodoro.PomodoroScreen
+import com.example.chillbox.ui.theme.ChillBoxTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppNavigation()
+            ChillBoxTheme {
+                AppNavigation()
+            }
         }
     }
 }
