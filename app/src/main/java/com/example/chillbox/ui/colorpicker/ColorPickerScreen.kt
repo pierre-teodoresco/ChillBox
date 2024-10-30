@@ -29,70 +29,89 @@ fun ColorPickerScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding((16 * scaleFactor).dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
         // Reusable BackButton from the BackButton.kt file
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        // Target Color Display
-        Text("Match this color", style = MaterialTheme.typography.titleMedium)
-        Box(
-            modifier = Modifier
-                .size((100 * scaleFactor).dp)
-                .background(
-                    color = Color(uiState.targetColor.first, uiState.targetColor.second, uiState.targetColor.third),
-                    shape = CircleShape
+        val spaceHeight = (if (!uiState.isSuccess) 64 else 200) * scaleFactor
+        Spacer(modifier = Modifier.height((spaceHeight).dp))
+
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // Target Color Display
+                Text("Match this color", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+                Box(
+                    modifier = Modifier
+                        .size((100 * scaleFactor).dp)
+                        .background(
+                            color = Color(uiState.targetColor.first, uiState.targetColor.second, uiState.targetColor.third),
+                            shape = CircleShape
+                        )
                 )
-        )
+            }
 
-        Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+            Spacer(modifier = Modifier.width((64 * scaleFactor).dp))
 
-        // User Color Display
-        Text("Your color", style = MaterialTheme.typography.titleMedium)
-        Box(
-            modifier = Modifier
-                .size((100 * scaleFactor).dp)
-                .background(
-                    color = Color(uiState.userColor.first, uiState.userColor.second, uiState.userColor.third),
-                    shape = CircleShape
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // User Color Display
+                Text("Your color", style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+                Box(
+                    modifier = Modifier
+                        .size((100 * scaleFactor).dp)
+                        .background(
+                            color = Color(uiState.userColor.first, uiState.userColor.second, uiState.userColor.third),
+                            shape = CircleShape
+                        )
                 )
-        )
+            }
+        }
 
-        Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
+        if (!uiState.isSuccess) {
+            Spacer(modifier = Modifier.height((64 * scaleFactor).dp))
 
-        // RGB Sliders with Colored Circles
-        SliderWithColorCircle(
-            color = Color.Red,
-            value = uiState.userColor.first,
-            onValueChange = { viewModel.updateUserColor(it, uiState.userColor.second, uiState.userColor.third) },
-            scaleFactor = scaleFactor
-        )
-        SliderWithColorCircle(
-            color = Color.Green,
-            value = uiState.userColor.second,
-            onValueChange = { viewModel.updateUserColor(uiState.userColor.first, it, uiState.userColor.third) },
-            scaleFactor = scaleFactor
-        )
-        SliderWithColorCircle(
-            color = Color.Blue,
-            value = uiState.userColor.third,
-            onValueChange = { viewModel.updateUserColor(uiState.userColor.first, uiState.userColor.second, it) },
-            scaleFactor = scaleFactor
-        )
+            // RGB Sliders with Colored Circles
+            SliderWithColorCircle(
+                color = Color.Red,
+                value = uiState.userColor.first,
+                onValueChange = { viewModel.updateUserColor(it, uiState.userColor.second, uiState.userColor.third) },
+                scaleFactor = scaleFactor
+            )
+            SliderWithColorCircle(
+                color = Color.Green,
+                value = uiState.userColor.second,
+                onValueChange = { viewModel.updateUserColor(uiState.userColor.first, it, uiState.userColor.third) },
+                scaleFactor = scaleFactor
+            )
+            SliderWithColorCircle(
+                color = Color.Blue,
+                value = uiState.userColor.third,
+                onValueChange = { viewModel.updateUserColor(uiState.userColor.first, uiState.userColor.second, it) },
+                scaleFactor = scaleFactor
+            )
+        } else {
+            Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
 
-        Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
-
-        // Result message
-        if (uiState.isSuccess) {
             Text(
                 "Success! You've matched the color!",
-                color = Color.Green,
+                color = Color.Black,
                 style = MaterialTheme.typography.titleMedium
             )
+            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
             Button(onClick = { viewModel.generateNewColor() }) {
                 Text("Play Again")
             }
