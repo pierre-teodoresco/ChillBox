@@ -1,10 +1,7 @@
 package com.example.chillbox.ui
 
 import android.content.Context
-import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
@@ -18,34 +15,41 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.chillbox.R
 import com.example.chillbox.model.TimeManager
 import com.example.chillbox.ui.components.BackButton
-import com.example.chillbox.ui.theme.ChillBoxTheme
 import com.example.chillbox.viewmodel.LofiRadioViewModel
 
-class LofiRadioActivity : ComponentActivity() {
-
-    private val lofiRadioViewModel: LofiRadioViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ChillBoxTheme {
-                LofiRadioScreen(viewModel = lofiRadioViewModel, context = this)
-            }
-        }
-        lofiRadioViewModel.setupMediaPlayer(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        lofiRadioViewModel.destroyMediaPlayer()
-    }
-}
+//class LofiRadioActivity : ComponentActivity() {
+//
+//    private val lofiRadioViewModel: LofiRadioViewModel by viewModels()
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContent {
+//            ChillBoxTheme {
+//                LofiRadioScreen(viewModel = lofiRadioViewModel, context = this)
+//            }
+//        }
+//        lofiRadioViewModel.setupMediaPlayer(this)
+//    }
+//
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        lofiRadioViewModel.destroyMediaPlayer()
+//    }
+//}
 
 @Composable
-fun LofiRadioScreen(viewModel: LofiRadioViewModel = LofiRadioViewModel(), context: Context) {
+fun LofiRadioScreen(
+    navController: NavController,
+    viewModel: LofiRadioViewModel = viewModel(),
+) {
+    // Get the current activity context to call finish()
+    val context = LocalContext.current as ComponentActivity
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
     // Define scaling factor based on screen width (e.g., tablets or large devices)
@@ -61,9 +65,9 @@ fun LofiRadioScreen(viewModel: LofiRadioViewModel = LofiRadioViewModel(), contex
             .padding((16 * scaleFactor).dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Reusable BackButton from the BackButton.kt file
+        // Back button to home screen
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
-            BackButton(scaleFactor = scaleFactor)
+            BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
         Spacer(modifier = Modifier.height((16 * scaleFactor).dp))

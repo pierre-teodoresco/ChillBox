@@ -110,7 +110,7 @@ class LofiRadioViewModel : ViewModel() {
                 }
                 updateSeekBar()
             }
-            mediaPlayer?.setOnErrorListener { _, what, extra ->
+            mediaPlayer?.setOnErrorListener { _, _, _ ->
                 // Handle error
                 false
             }

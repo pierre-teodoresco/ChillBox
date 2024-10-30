@@ -5,37 +5,24 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.example.chillbox.model.PomodoroSessionType
+import com.example.chillbox.model.PomodoroState
 import com.example.chillbox.model.TimeManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class PomodoroViewModel : ViewModel() {
+    private val _state = MutableStateFlow(PomodoroState())
+    val state: StateFlow<PomodoroState> = _state.asStateFlow()
 
-    // LiveData to track sessions length in minutes
-    var workSessionLength = MutableLiveData(20)
-    var shortRestSessionLength = MutableLiveData(5)
-    var longRestSessionLength = MutableLiveData(30)
-
-    // Default values
-    private var defaultWorkSessionLength = 20*60
-
-    private var currentTimeInSeconds = workSessionLength.value?.times(60) ?: defaultWorkSessionLength
-
+    private var currentTimeInSeconds = _state.value.workSessionLength * 60
     private var timerJob: Job? = null
-
-    // LiveData to track session type and timer value
-    val currentSession = MutableLiveData<PomodoroSessionType>().apply { value = PomodoroSessionType.Work }
-    val timerValue = MutableLiveData("00:00") // Default work session value
-    val isTimerRunning = MutableLiveData(false)
-    val workSessionCount = MutableLiveData(0) // Track work session count0
-
-    // Initialize timer display
-    init {
-        updateTimerDisplay()
-    }
 
     // Set the work session length
     fun setWorkSessionLength(minutes: Int) {
-        workSessionLength.value = minutes
-        if (currentSession.value == PomodoroSessionType.Work) {
+        _state.update { it.copy(workSessionLength = minutes) }
+        if (_state.value.currentSession == PomodoroSessionType.Work) {
             currentTimeInSeconds = minutes * 60
             updateTimerDisplay()
         }
@@ -43,8 +30,8 @@ class PomodoroViewModel : ViewModel() {
 
     // Set the short rest session length
     fun setShortRestSessionLength(minutes: Int) {
-        shortRestSessionLength.value = minutes
-        if (currentSession.value == PomodoroSessionType.Rest) {
+        _state.update { it.copy(shortRestSessionLength = minutes) }
+        if (_state.value.currentSession == PomodoroSessionType.Rest) {
             currentTimeInSeconds = minutes * 60
             updateTimerDisplay()
         }
@@ -52,8 +39,8 @@ class PomodoroViewModel : ViewModel() {
 
     // Set the long rest session length
     fun setLongRestSessionLength(minutes: Int) {
-        longRestSessionLength.value = minutes
-        if (currentSession.value == PomodoroSessionType.LongRest) {
+        _state.update { it.copy(longRestSessionLength = minutes) }
+        if (_state.value.currentSession == PomodoroSessionType.LongRest) {
             currentTimeInSeconds = minutes * 60
             updateTimerDisplay()
         }
@@ -62,9 +49,9 @@ class PomodoroViewModel : ViewModel() {
     // Start the timer
     fun startTimer() {
         updateTimerDisplay()
-        isTimerRunning.value = true
+        _state.update { it.copy(isTimerRunning = true) }
         timerJob = viewModelScope.launch {
-            while (currentTimeInSeconds > 0 && isTimerRunning.value == true) {
+            while (currentTimeInSeconds > 0 && _state.value.isTimerRunning) {
                 delay(1000) // Delay for 1 second
                 currentTimeInSeconds--
                 updateTimerDisplay()
@@ -77,17 +64,19 @@ class PomodoroViewModel : ViewModel() {
 
     // Pause the timer
     fun pauseTimer() {
-        isTimerRunning.value = false
+        _state.update { it.copy(isTimerRunning = false) }
         timerJob?.cancel()
     }
 
     // Reset the timer to the first work session
     fun resetTimer() {
         pauseTimer()
-        currentSession.value = PomodoroSessionType.Work
-        workSessionCount.value = 0
-        isTimerRunning.value = false
-        currentTimeInSeconds = workSessionLength.value?.times(60) ?: defaultWorkSessionLength
+        _state.update { it.copy(
+            currentSession = PomodoroSessionType.Work,
+            workSessionCount = 0,
+            isTimerRunning = false
+        ) }
+        currentTimeInSeconds = _state.value.workSessionLength * 60
         updateTimerDisplay()
     }
 
@@ -101,41 +90,44 @@ class PomodoroViewModel : ViewModel() {
     // Switch between sessions
     private fun switchSession() {
         // Increment the work session count only when in Work session
-        if (currentSession.value == PomodoroSessionType.Work) {
-            workSessionCount.value = (workSessionCount.value ?: 0) + 1
+        if (_state.value.currentSession == PomodoroSessionType.Work) {
+            val updatedScore = _state.value.workSessionCount.inc()
+            _state.update { it.copy(workSessionCount = updatedScore) }
         }
 
         // Reset work session count when switching to Long Rest
-        if (currentSession.value == PomodoroSessionType.LongRest) {
-            workSessionCount.value = 0
+        if (_state.value.currentSession == PomodoroSessionType.LongRest) {
+            _state.update { it.copy(workSessionCount = 0) }
         }
 
         // Determine the next session based on the current session
-        currentSession.value = when (currentSession.value) {
-            PomodoroSessionType.Work ->
-                if ((workSessionCount.value ?: 0) % 5 == 0) {
-                    PomodoroSessionType.LongRest
-                } else {
-                    PomodoroSessionType.Rest
+        _state.update {
+            it.copy(currentSession =
+                when (_state.value.currentSession) {
+                    PomodoroSessionType.Work ->
+                        if (_state.value.workSessionCount % 5 == 0) {
+                            PomodoroSessionType.LongRest
+                        } else {
+                            PomodoroSessionType.Rest
+                        }
+                    PomodoroSessionType.Rest, PomodoroSessionType.LongRest -> PomodoroSessionType.Work
                 }
-            PomodoroSessionType.Rest, PomodoroSessionType.LongRest -> PomodoroSessionType.Work
-            else -> PomodoroSessionType.Work
+            )
         }
 
         // Update the timer value based on the next session
         currentTimeInSeconds =
-            when (currentSession.value) {
-                PomodoroSessionType.Work -> workSessionLength.value
-                PomodoroSessionType.Rest -> shortRestSessionLength.value
-                PomodoroSessionType.LongRest -> longRestSessionLength.value
-                null -> workSessionLength.value
-            }?.times(60) ?: defaultWorkSessionLength
+            when (_state.value.currentSession) {
+                PomodoroSessionType.Work -> _state.value.workSessionLength
+                PomodoroSessionType.Rest -> _state.value.shortRestSessionLength
+                PomodoroSessionType.LongRest -> _state.value.longRestSessionLength
+            } * 60
 
         startTimer() // Automatically start next session
     }
 
     // Update timer display in MM:SS format
     private fun updateTimerDisplay() {
-        timerValue.value = TimeManager.formatTime(currentTimeInSeconds)
+        _state.update { it.copy(timerValue = TimeManager.formatTime(currentTimeInSeconds)) }
     }
 }

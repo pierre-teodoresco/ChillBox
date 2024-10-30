@@ -1,9 +1,5 @@
 package com.example.chillbox.ui
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -30,50 +27,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.chillbox.R
 import com.example.chillbox.model.PomodoroSessionType
 import com.example.chillbox.ui.components.BackButton
-import com.example.chillbox.ui.theme.ChillBoxTheme
 import com.example.chillbox.viewmodel.PomodoroViewModel
 
-class PomodoroActivity : ComponentActivity() {
-
-    private val pomodoroViewModel: PomodoroViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ChillBoxTheme {
-                PomodoroScreen(pomodoroViewModel)
-            }
-        }
-    }
-}
-
 @Composable
-fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
+fun PomodoroScreen(
+    viewModel: PomodoroViewModel = viewModel(),
+    navController: NavController
+) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
     val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
 
-    // LiveData to observe session type, timer value, and timer state
-    val currentSession by viewModel.currentSession.observeAsState(PomodoroSessionType.Work)
-    val timerValue by viewModel.timerValue.observeAsState("00:00")
-    val isTimerRunning by viewModel.isTimerRunning.observeAsState(false)
-    val workSessionCount by viewModel.workSessionCount.observeAsState(0)
-
-    // LiveData to observe session length values
-    val workSessionLength by viewModel.workSessionLength.observeAsState(20)
-    val shortRestSessionLength by viewModel.shortRestSessionLength.observeAsState(5)
-    val longRestSessionLength by viewModel.longRestSessionLength.observeAsState(30)
+    // State
+    val state by viewModel.state.collectAsState()
 
     // Background color based on session type
-    val backgroundColor = when (currentSession) {
+    val backgroundColor = when (state.currentSession) {
         PomodoroSessionType.Work -> MaterialTheme.colorScheme.tertiary
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
@@ -87,18 +65,17 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
     ) {
         // Reusable BackButton from the BackButton.kt file
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
-            BackButton(scaleFactor = scaleFactor)
+            BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
         Spacer(modifier = Modifier.height((150 * scaleFactor).dp))
 
         // Session Type Display (Work Session, Rest Session, Long Rest Session)
         Text(
-            text = when (currentSession) {
+            text = when (state.currentSession) {
                 PomodoroSessionType.Work -> "Work Session"
                 PomodoroSessionType.Rest -> "Rest Session"
                 PomodoroSessionType.LongRest -> "Long Rest Session"
-                else -> "Work Session"
             },
             style = MaterialTheme.typography.titleLarge.copy(fontSize = (32 * scaleFactor).sp)
         )
@@ -107,7 +84,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
 
         // Timer Display (Minutes:Seconds)
         Text(
-            text = timerValue, // Display timer value as MM:SS
+            text = state.timerValue, // Display timer value as MM:SS
             style = MaterialTheme.typography.titleLarge.copy(fontSize = (64 * scaleFactor).sp),
             fontWeight = FontWeight.Bold,
         )
@@ -120,7 +97,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             horizontalArrangement = Arrangement.Center
         ) {
             for (i in 0 until 5) {
-                val color = if (i < workSessionCount.coerceAtMost(5)) {
+                val color = if (i < state.workSessionCount.coerceAtMost(5)) {
                     Color.Black
                 } else {
                     Color.White
@@ -142,7 +119,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             // Play or Pause button based on timer state
-            if (isTimerRunning) {
+            if (state.isTimerRunning) {
                 IconButton (
                     onClick = { viewModel.pauseTimer() }, // Pause the timer
                     modifier = Modifier.padding((8 * scaleFactor).dp)
@@ -198,7 +175,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             // Work Session Length
             SessionLengthSlider(
                 label = "Work",
-                length = workSessionLength,
+                length = state.workSessionLength,
                 onValueChange = { viewModel.setWorkSessionLength(it.toInt()) },
                 scaleFactor = scaleFactor
             )
@@ -208,7 +185,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             // Short Rest Session Length
             SessionLengthSlider(
                 label = "Short Rest",
-                length = shortRestSessionLength,
+                length = state.shortRestSessionLength,
                 onValueChange = { viewModel.setShortRestSessionLength(it.toInt()) },
                 scaleFactor = scaleFactor
             )
@@ -218,7 +195,7 @@ fun PomodoroScreen(viewModel: PomodoroViewModel = PomodoroViewModel()) {
             // Long Rest Session Length
             SessionLengthSlider(
                 label = "Long Rest",
-                length = longRestSessionLength,
+                length = state.longRestSessionLength,
                 onValueChange = { viewModel.setLongRestSessionLength(it.toInt()) },
                 scaleFactor = scaleFactor
             )
@@ -244,12 +221,4 @@ fun SessionLengthSlider(
         valueRange = 1f..60f,
         modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PomodoroScreenPreview() {
-    ChillBoxTheme {
-        PomodoroScreen()
-    }
 }
