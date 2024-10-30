@@ -1,6 +1,5 @@
 package com.example.chillbox
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,8 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chillbox.ui.AmbianceScreen
 import com.example.chillbox.ui.CuteVideosScreen
-import com.example.chillbox.ui.GameScreen
 import com.example.chillbox.ui.HomeScreen
+import com.example.chillbox.ui.colorpicker.ColorPickerScreen
 import com.example.chillbox.ui.lofiradio.LofiRadioScreen
 import com.example.chillbox.ui.pomodoro.PomodoroScreen
 
@@ -31,7 +30,7 @@ fun AppNavigation() {
         composable("home") { HomeScreen(navController = navController) }
         composable("lofi_radio") { LofiRadioScreen(navController = navController) }
         composable("pomodoro") { PomodoroScreen(navController = navController) }
-        composable("game") { GameScreen(navController = navController) }
+        composable("color_picker") { ColorPickerScreen(navController = navController) }
         composable("ambiance") { AmbianceScreen(navController = navController) }
         composable("cute_videos") { CuteVideosScreen(navController = navController) }
     }

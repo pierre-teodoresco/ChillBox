@@ -87,8 +87,6 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
 
 @Composable
 fun CardsGrid(scaleFactor: Float, navController: NavController) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .padding((30 * scaleFactor).dp)
@@ -111,7 +109,7 @@ fun CardsGrid(scaleFactor: Float, navController: NavController) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             CardItem(R.drawable.game, R.string.game, scaleFactor) {
-               navController.navigate("game")
+               navController.navigate("color_picker")
             }
         }
         Row(
