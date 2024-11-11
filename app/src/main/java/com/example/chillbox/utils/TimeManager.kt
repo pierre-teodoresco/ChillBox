@@ -1,4 +1,4 @@
-package com.example.chillbox.model
+package com.example.chillbox.utils
 
 import android.annotation.SuppressLint
 

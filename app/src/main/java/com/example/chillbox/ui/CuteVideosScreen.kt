@@ -1,8 +1,5 @@
-package com.example.chillbox
+package com.example.chillbox.ui
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,24 +7,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.chillbox.ui.components.BackButton
-import com.example.chillbox.ui.theme.ChillBoxTheme
-
-class GameActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ChillBoxTheme {
-                GameScreen()
-            }
-        }
-    }
-}
 
 @Composable
-fun GameScreen() {
+fun CuteVideosScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
@@ -40,17 +25,9 @@ fun GameScreen() {
             .padding((16 * scaleFactor).dp)
     ) {
         // Reusable BackButton from the BackButton.kt file
-        BackButton(scaleFactor = scaleFactor)
+        BackButton(navController = navController, scaleFactor = scaleFactor)
 
         // Placeholder text for Pomodoro Timer Screen
-        Text(text = "Game Screen", modifier = Modifier.padding(top = (16 * scaleFactor).dp))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GameScreenPreview() {
-    ChillBoxTheme {
-        GameScreen()
+        Text(text = "Cute Videos Screen", modifier = Modifier.padding(top = (16 * scaleFactor).dp))
     }
 }
