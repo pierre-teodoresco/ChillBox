@@ -1,8 +1,14 @@
 package com.example.chillbox
 
 import android.content.Context
+import android.graphics.Point
+import android.graphics.Rect
+import android.graphics.RectF
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.view.View
+import android.view.ViewTreeObserver
+import android.widget.ImageView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.core.LinearEasing
@@ -16,8 +22,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -27,6 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.example.chillbox.ui.components.BackButton
 import com.example.chillbox.ui.theme.ChillBoxTheme
 
@@ -58,109 +67,271 @@ fun AmbianceScreen() {
         BackButton(scaleFactor = scaleFactor)
 
         // Display the interactive image
-        InteractiveImage(
+        DisplayImage(
             modifier = Modifier.fillMaxSize()
         )
     }
 }
 
 @Composable
-fun InteractiveImage(modifier: Modifier = Modifier) {
-    var imageRes by remember { mutableStateOf(R.drawable.island_true) }
-    val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
+fun DisplayImage(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    var showDebug by remember { mutableStateOf(true) }
+    var relativePosition by remember { mutableStateOf<Rect?>(null) }
+    var imageView by remember { mutableStateOf<ImageView?>(null) }
+    val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
 
-    val interactiveRegions = remember {
-        mutableStateMapOf(
-            R.drawable.island_true to listOf(
-                Region("temple", 600f..775f, 500f..825f),
-                Region("waterfall", 275f..400f, 725f..925f),
-                Region("forest", 425f..550f, 500f..750f),
-                Region("beach", 200f..500f, 1150f..1275f),
-                Region("boat", 580f..675f, 1250f..1325f)
-            ),
-            R.drawable.mountain to listOf(
-                Region("mountain_peak", 300f..400f, 100f..200f),
-                Region("mountain_base", 200f..300f, 300f..400f)
-            )
+    Box(modifier = modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { ctx ->
+                ImageView(ctx).apply {
+                    setImageResource(R.drawable.island_true)
+                    scaleType = ImageView.ScaleType.CENTER_INSIDE
+                }
+            },
+            modifier = Modifier.fillMaxSize(),
+            update = { view ->
+                imageView = view
+                view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        relativePosition = getRelativePosition(view)
+                    }
+                })
+            }
         )
-    }
 
-    Box(modifier = modifier) {
-        Image(
-            painter = painterResource(id = imageRes),
-            contentDescription = "Island with interactive regions",
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
-                        val clickedRegion = detectClickedRegion(offset, interactiveRegions[imageRes] ?: emptyList())
+        // Draw a point in all corners of the image using the relative position
+        Canvas(modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures { offset ->
+                    relativePosition?.let { position ->
+                        imageView?.let { view ->
+                            val imageBounds = getImageBounds(view)
+                            val imageWidth = imageBounds.right - imageBounds.left
+                            val imageHeight = imageBounds.bottom - imageBounds.top
 
-                        when (clickedRegion) {
-                            "temple" -> playSound(context, mediaPlayer, R.raw.temple)
-                            "waterfall" -> playSound(context, mediaPlayer, R.raw.waterfall)
-                            "forest" -> playSound(context, mediaPlayer, R.raw.forest)
-                            "beach" -> playSound(context, mediaPlayer, R.raw.beach)
-                            "boat" -> imageRes = R.drawable.mountain
-                            "mountain_peak" -> playSound(context, mediaPlayer, R.raw.forest)
-                            "mountain_base" -> imageRes = R.drawable.island_true
+                            val rings = listOf(
+                                Ring(Color.Red, 0.52f, 0.2f, 0.19f, 0.27f, R.raw.temple),
+                                Ring(Color.Yellow, 0.22f, 0.35f, 0.16f, 0.27f, R.raw.waterfall),
+                                Ring(Color.Green, 0.35f, 0.18f, 0.16f, 0.27f, R.raw.forest),
+                                Ring(Color.Cyan, 0.20f, 0.75f, 0.3f, 0.16f, R.raw.beach),
+                                Ring(Color.Black, 0.515f, 0.87f, 0.1f, 0.1f, R.raw.twinkle_sound)
+                            )
+
+                            for (ring in rings) {
+                                val ringBounds = getRingBounds(
+                                    imageBounds,
+                                    imageWidth,
+                                    imageHeight,
+                                    ring.mainRingXPercentage,
+                                    ring.mainRingYPercentage,
+                                    ring.mainRingWidthPercentage,
+                                    ring.mainRingHeightPercentage
+                                )
+
+                                if (ringBounds.contains(offset.x.toInt(), offset.y.toInt())) {
+                                    playSound(context, mediaPlayer, ring.soundResId)
+                                    break
+                                }
+                            }
                         }
                     }
                 }
-        )
+            }
+        ) {
+            relativePosition?.let { position ->
+                imageView?.let { view ->
+                    val imageBounds = getImageBounds(view)
 
-        if (showDebug) {
-            AnimatedInteractiveAreas(interactiveRegions[imageRes] ?: emptyList())
+                    // Width and height of the image
+                    val imageWidth = imageBounds.right - imageBounds.left
+                    val imageHeight = imageBounds.bottom - imageBounds.top
+
+                    val strokeWidth = 17f // Adjust the stroke width as needed
+
+                    val shadowOffset = 5f // Adjust the shadow offset as needed
+
+                    drawRingWithShadow(
+                        color = Color.Red,
+                        imageBounds = imageBounds,
+                        imageWidth = imageWidth,
+                        imageHeight = imageHeight,
+                        strokeWidth = strokeWidth,
+                        shadowOffset = shadowOffset,
+                        mainRingXPercentage = 0.52f,
+                        mainRingYPercentage = 0.2f,
+                        mainRingWidthPercentage = 0.19f,
+                        mainRingHeightPercentage = 0.27f
+                    )
+
+                    drawRingWithShadow(
+                        color = Color.Yellow,
+                        imageBounds = imageBounds,
+                        imageWidth = imageWidth,
+                        imageHeight = imageHeight,
+                        strokeWidth = strokeWidth,
+                        shadowOffset = shadowOffset,
+                        mainRingXPercentage = 0.22f,
+                        mainRingYPercentage = 0.35f,
+                        mainRingWidthPercentage = 0.16f,
+                        mainRingHeightPercentage = 0.27f
+                    )
+
+                    drawRingWithShadow(
+                        color = Color.Green,
+                        imageBounds = imageBounds,
+                        imageWidth = imageWidth,
+                        imageHeight = imageHeight,
+                        strokeWidth = strokeWidth,
+                        shadowOffset = shadowOffset,
+                        mainRingXPercentage = 0.35f,
+                        mainRingYPercentage = 0.18f,
+                        mainRingWidthPercentage = 0.16f,
+                        mainRingHeightPercentage = 0.27f
+                    )
+
+                    drawRingWithShadow(
+                        color = Color.Cyan,
+                        imageBounds = imageBounds,
+                        imageWidth = imageWidth,
+                        imageHeight = imageHeight,
+                        strokeWidth = strokeWidth,
+                        shadowOffset = shadowOffset,
+                        mainRingXPercentage = 0.20f,
+                        mainRingYPercentage = 0.75f,
+                        mainRingWidthPercentage = 0.3f,
+                        mainRingHeightPercentage = 0.16f
+                    )
+
+                    drawRingWithShadow(
+                        color = Color.Black,
+                        imageBounds = imageBounds,
+                        imageWidth = imageWidth,
+                        imageHeight = imageHeight,
+                        strokeWidth = strokeWidth,
+                        shadowOffset = shadowOffset,
+                        mainRingXPercentage = 0.515f,
+                        mainRingYPercentage = 0.87f,
+                        mainRingWidthPercentage = 0.1f,
+                        mainRingHeightPercentage = 0.1f
+                    )
+                }
+            }
         }
     }
 }
 
-@Composable
-fun AnimatedInteractiveAreas(regions: List<Region>) {
-    val alpha by animateFloatAsState(
-        targetValue = 0.5f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+// Helper function to get the bounds of a ring
+fun getRingBounds(
+    imageBounds: RectF,
+    imageWidth: Float,
+    imageHeight: Float,
+    mainRingXPercentage: Float,
+    mainRingYPercentage: Float,
+    mainRingWidthPercentage: Float,
+    mainRingHeightPercentage: Float
+): Rect {
+    val ringX = imageBounds.left + (mainRingXPercentage * imageWidth)
+    val ringY = imageBounds.top + (mainRingYPercentage * imageHeight)
+    val ringWidth = mainRingWidthPercentage * imageWidth
+    val ringHeight = mainRingHeightPercentage * imageHeight
+
+    return Rect(
+        ringX.toInt(),
+        ringY.toInt(),
+        (ringX + ringWidth).toInt(),
+        (ringY + ringHeight).toInt()
+    )
+}
+
+fun DrawScope.drawRingWithShadow(
+    color: Color,
+    imageBounds: RectF,
+    imageWidth: Float,
+    imageHeight: Float,
+    strokeWidth: Float,
+    shadowOffset: Float,
+    mainRingXPercentage: Float,
+    mainRingYPercentage: Float,
+    mainRingWidthPercentage: Float,
+    mainRingHeightPercentage: Float
+) {
+    // Draw the main ring
+    drawArc(
+        color = color,
+        startAngle = 0f,
+        sweepAngle = 360f,
+        useCenter = false,
+        topLeft = Offset(imageBounds.left + mainRingXPercentage * imageWidth, imageBounds.top + mainRingYPercentage * imageHeight),
+        size = Size(mainRingWidthPercentage * imageWidth, mainRingHeightPercentage * imageHeight),
+        style = Stroke(width = strokeWidth)
     )
 
-    val strokeWidth by animateFloatAsState(
-        targetValue = 10f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        )
+    // Draw a shadow to simulate the depth of the ring
+    drawArc(
+        color = Color.Black.copy(alpha = 0.5f), // Shadow color with alpha
+        startAngle = 0f,
+        sweepAngle = 360f,
+        useCenter = false,
+        topLeft = Offset(imageBounds.left + mainRingXPercentage * imageWidth + shadowOffset, imageBounds.top + mainRingYPercentage * imageHeight + shadowOffset), // Slightly offset the shadow
+        size = Size(mainRingWidthPercentage * imageWidth, mainRingHeightPercentage * imageHeight),
+        style = Stroke(width = strokeWidth)
     )
+}
 
-    // Log the animation values to ensure they are changing
-    LaunchedEffect(alpha, strokeWidth) {
-        println("Alpha: $alpha, StrokeWidth: $strokeWidth")
-    }
+private fun getRelativePosition(myView: View): Rect {
+    val rect = Rect()
+    var currentView: View? = myView
 
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        regions.forEach { region ->
-            drawOval(
-                color = Color.Blue.copy(alpha = alpha),
-                topLeft = Offset(region.xRange.start, region.yRange.start),
-                size = androidx.compose.ui.geometry.Size(
-                    region.xRange.endInclusive - region.xRange.start,
-                    region.yRange.endInclusive - region.yRange.start
-                ),
-                style = Stroke(width = strokeWidth)
-            )
+    while (currentView != null) {
+        rect.left += currentView.left
+        rect.top += currentView.top
+
+        if (currentView.parent === currentView.rootView) {
+            break
         }
+
+        currentView = currentView.parent as? View
     }
+
+    rect.right = rect.left + myView.width
+    rect.bottom = rect.top + myView.height
+
+    return rect
 }
 
-// Helper function to detect the clicked region
-fun detectClickedRegion(offset: Offset, regions: List<Region>): String {
-    // Define specific areas for each interactive region based on the image dimensions
-    return regions.find { region ->
-        offset.x in region.xRange && offset.y in region.yRange
-    }?.name ?: ""
+private fun getImageBounds(view: ImageView): RectF {
+    val drawable = view.drawable ?: return RectF()
+    val imageRatio = drawable.intrinsicWidth.toFloat() / drawable.intrinsicHeight.toFloat()
+    val viewRatio = view.width.toFloat() / view.height.toFloat()
+
+    val rect = RectF()
+
+    if (imageRatio > viewRatio) {
+        // Image is wider than the view
+        val height = view.width / imageRatio
+        val top = (view.height - height) / 2
+        rect.set(0f, top, view.width.toFloat(), top + height)
+    } else {
+        // Image is taller than the view
+        val width = view.height * imageRatio
+        val left = (view.width - width) / 2
+        rect.set(left, 0f, left + width, view.height.toFloat())
+    }
+
+    return rect
 }
+
+// Data class to represent a ring with an associated sound resource
+data class Ring(
+    val color: Color,
+    val mainRingXPercentage: Float,
+    val mainRingYPercentage: Float,
+    val mainRingWidthPercentage: Float,
+    val mainRingHeightPercentage: Float,
+    val soundResId: Int
+)
 
 // Helper function to play a sound
 fun playSound(context: Context, mediaPlayer: MutableState<MediaPlayer?>, soundResId: Int) {
@@ -169,8 +340,6 @@ fun playSound(context: Context, mediaPlayer: MutableState<MediaPlayer?>, soundRe
     mediaPlayer.value?.isLooping = true  // Set looping to true
     mediaPlayer.value?.start()
 }
-
-data class Region(val name: String, val xRange: ClosedFloatingPointRange<Float>, val yRange: ClosedFloatingPointRange<Float>)
 
 @Preview(showBackground = true)
 @Composable
