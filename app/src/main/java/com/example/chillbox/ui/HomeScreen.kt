@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.chillbox.R
+import com.example.chillbox.ui.components.CubeCarousel
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -50,10 +52,37 @@ fun HomeScreen(navController: NavController) {
             scaleFactor = scaleFactor
         )
 
-        // Cards section with scaling
-        CardsGrid(scaleFactor = scaleFactor, navController = navController)
+        CubeCarousel(
+            items = listOf(
+                {
+                    CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) {
+                        navController.navigate("lofi_radio")
+                    }
+                },
+                {
+                    CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) {
+                        navController.navigate("pomodoro")
+                    }
+                },
+                {
+                    CardItem(R.drawable.game, R.string.game, scaleFactor) {
+                        navController.navigate("color_picker")
+                    }
+                },
+                {
+                    CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) {
+                        navController.navigate("ambiance")
+                    }
+                },
+                {
+                    CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) {
+                        navController.navigate("cute_videos")
+                    }
+                }
+            ),
+            scaleFactor = scaleFactor
+        )
 
-        // Footer with default size
         Footer(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primary),
@@ -74,54 +103,14 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
         Image(
             painter = painterResource(id = R.drawable.ic_chillbox_logo),
             contentDescription = stringResource(id = R.string.app_logo),
-            modifier = Modifier.size((80 * scaleFactor).dp) // Scaled logo size
+            modifier = Modifier.size((80 * scaleFactor).dp)
         )
+
         Text(
-            text = stringResource(id = R.string.username),
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (22 * scaleFactor).sp), // Scaled text size
+            text = stringResource(id = R.string.app_name),
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = (22 * scaleFactor).sp),
             color = MaterialTheme.colorScheme.onPrimary
         )
-    }
-}
-
-@Composable
-fun CardsGrid(scaleFactor: Float, navController: NavController) {
-    Column(
-        modifier = Modifier
-            .padding((30 * scaleFactor).dp)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy((70 * scaleFactor).dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) {
-                navController.navigate("lofi_radio")
-            }
-            CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) {
-                navController.navigate("pomodoro")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CardItem(R.drawable.game, R.string.game, scaleFactor) {
-               navController.navigate("color_picker")
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) {
-                navController.navigate("ambiance")
-            }
-            CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) {
-                navController.navigate("cute_videos")
-            }
-        }
     }
 }
 
@@ -129,7 +118,8 @@ fun CardsGrid(scaleFactor: Float, navController: NavController) {
 fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .size((120 * scaleFactor).dp)
+            .fillMaxWidth()
+            .height((600 * scaleFactor).dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
@@ -150,13 +140,13 @@ fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Uni
                 painter = painterResource(id = imageRes),
                 contentDescription = stringResource(id = textRes),
                 modifier = Modifier
-                    .size((80 * scaleFactor).dp)
+                    .fillMaxSize(0.70f)
                     .align(Alignment.CenterHorizontally) // Ensure the image is centered
                     .padding((8 * scaleFactor).dp)
             )
             Text(
                 text = stringResource(id = textRes),
-                fontSize = (14 * scaleFactor).sp,
+                fontSize = (30 * scaleFactor).sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.CenterHorizontally) // Ensure text is centered
             )
