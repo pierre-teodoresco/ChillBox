@@ -1,6 +1,8 @@
 package com.example.chillbox.ui.components
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -9,10 +11,14 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -23,6 +29,44 @@ fun CubeCarousel(
 ) {
     val pagerState = rememberPagerState(pageCount = { items.size })
     val coroutineScope = rememberCoroutineScope()
+
+    Row {
+        // Add left arrow
+        IconButton(
+            modifier = Modifier
+                .padding((16 * scaleFactor).dp),
+            onClick = { // Trigger callback
+                val previousPage = (pagerState.currentPage - 1).coerceAtLeast(0)
+                // Scroll to the previous page
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(previousPage)
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Previous"
+            )
+        }
+
+        // Add right arrow
+        IconButton(
+            modifier = Modifier
+                .padding((16 * scaleFactor).dp),
+            onClick = { // Trigger callback
+                val nextPage = (pagerState.currentPage + 1).coerceAtMost(items.size - 1)
+                // Scroll to the next page
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(nextPage)
+                }
+            }
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = "Next"
+            )
+        }
+    }
 
     Box(modifier = Modifier.fillMaxWidth()) {
         HorizontalPager(
@@ -54,42 +98,44 @@ fun CubeCarousel(
                 items[page]()
             }
         }
+    }
 
-        // Add left arrow
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .padding((16 * scaleFactor).dp),
-            onClick = { // Trigger callback
-                val previousPage = (pagerState.currentPage - 1).coerceAtLeast(0)
-                // Scroll to the previous page
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(previousPage)
-                }
-            }
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Previous"
-            )
+    // Page Indicator Slider
+    PageIndicator(
+        pageCount = items.size,
+        currentPage = pagerState.currentPage,
+        scaleFactor = scaleFactor
+    ) { selectedPage ->
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(selectedPage)
         }
+    }
+}
 
-        // Add right arrow
-        IconButton(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding((16 * scaleFactor).dp),
-            onClick = { // Trigger callback
-                val nextPage = (pagerState.currentPage + 1).coerceAtMost(items.size - 1)
-                // Scroll to the next page
-                coroutineScope.launch {
-                    pagerState.animateScrollToPage(nextPage)
-                }
-            }
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Next"
+@Composable
+fun PageIndicator(
+    pageCount: Int,
+    currentPage: Int,
+    scaleFactor: Float,
+    onPageSelected: (Int) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .padding(top = (8 * scaleFactor).dp)
+            .clipToBounds(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        for (i in 0 until pageCount) {
+            val isSelected = i == currentPage
+            val size: Dp = (30 * scaleFactor).dp
+            val color: Color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Gray
+
+            Box(
+                modifier = Modifier
+                    .size(size)
+                    .padding(horizontal = (4 * scaleFactor).dp)
+                    .background(color = color, shape = MaterialTheme.shapes.small)
+                    .clickable { onPageSelected(i) }
             )
         }
     }
