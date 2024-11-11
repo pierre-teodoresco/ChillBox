@@ -1,26 +1,13 @@
-package com.example.chillbox
+package com.example.chillbox.ui.ambiance
 
-import android.content.Context
-import android.graphics.Point
 import android.graphics.Rect
 import android.graphics.RectF
-import android.media.MediaPlayer
-import android.os.Bundle
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,26 +19,18 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.chillbox.R
 import com.example.chillbox.ui.components.BackButton
-import com.example.chillbox.ui.theme.ChillBoxTheme
-
-class AmbianceActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ChillBoxTheme {
-                AmbianceScreen()
-            }
-        }
-    }
-}
 
 @Composable
-fun AmbianceScreen() {
+fun AmbianceScreen(
+    navController: NavController,
+    viewModel: AmbianceViewModel = viewModel(),
+) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
@@ -63,22 +42,27 @@ fun AmbianceScreen() {
             .fillMaxSize()
             .padding((16 * scaleFactor).dp)
     ) {
-        // Reusable BackButton from the BackButton.kt file
-        BackButton(scaleFactor = scaleFactor)
+        // Back button to home screen
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+            BackButton(
+                navController = navController,
+                scaleFactor = scaleFactor
+            )
+        }
 
         // Display the interactive image
         DisplayImage(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            viewModel = viewModel
         )
     }
 }
 
 @Composable
-fun DisplayImage(modifier: Modifier = Modifier) {
+fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
     val context = LocalContext.current
     var relativePosition by remember { mutableStateOf<Rect?>(null) }
     var imageView by remember { mutableStateOf<ImageView?>(null) }
-    val mediaPlayer = remember { mutableStateOf<MediaPlayer?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
@@ -105,21 +89,13 @@ fun DisplayImage(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .pointerInput(Unit) {
                 detectTapGestures { offset ->
-                    relativePosition?.let { position ->
+                    relativePosition?.let {
                         imageView?.let { view ->
                             val imageBounds = getImageBounds(view)
                             val imageWidth = imageBounds.right - imageBounds.left
                             val imageHeight = imageBounds.bottom - imageBounds.top
 
-                            val rings = listOf(
-                                Ring(Color.Red, 0.52f, 0.2f, 0.19f, 0.27f, R.raw.temple),
-                                Ring(Color.Yellow, 0.22f, 0.35f, 0.16f, 0.27f, R.raw.waterfall),
-                                Ring(Color.Green, 0.35f, 0.18f, 0.16f, 0.27f, R.raw.forest),
-                                Ring(Color.Cyan, 0.20f, 0.75f, 0.3f, 0.16f, R.raw.beach),
-                                Ring(Color.Black, 0.515f, 0.87f, 0.1f, 0.1f, R.raw.twinkle_sound)
-                            )
-
-                            for (ring in rings) {
+                            for (ring in viewModel.rings) {
                                 val ringBounds = getRingBounds(
                                     imageBounds,
                                     imageWidth,
@@ -131,7 +107,7 @@ fun DisplayImage(modifier: Modifier = Modifier) {
                                 )
 
                                 if (ringBounds.contains(offset.x.toInt(), offset.y.toInt())) {
-                                    playSound(context, mediaPlayer, ring.soundResId)
+                                    viewModel.playSound(context, ring.soundResId)
                                     break
                                 }
                             }
@@ -140,7 +116,7 @@ fun DisplayImage(modifier: Modifier = Modifier) {
                 }
             }
         ) {
-            relativePosition?.let { position ->
+            relativePosition?.let {
                 imageView?.let { view ->
                     val imageBounds = getImageBounds(view)
 
@@ -321,30 +297,4 @@ private fun getImageBounds(view: ImageView): RectF {
     }
 
     return rect
-}
-
-// Data class to represent a ring with an associated sound resource
-data class Ring(
-    val color: Color,
-    val mainRingXPercentage: Float,
-    val mainRingYPercentage: Float,
-    val mainRingWidthPercentage: Float,
-    val mainRingHeightPercentage: Float,
-    val soundResId: Int
-)
-
-// Helper function to play a sound
-fun playSound(context: Context, mediaPlayer: MutableState<MediaPlayer?>, soundResId: Int) {
-    mediaPlayer.value?.release()  // Release any existing MediaPlayer instance
-    mediaPlayer.value = MediaPlayer.create(context, soundResId)
-    mediaPlayer.value?.isLooping = true  // Set looping to true
-    mediaPlayer.value?.start()
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AmbianceScreenPreview() {
-    ChillBoxTheme {
-        AmbianceScreen()
-    }
 }
