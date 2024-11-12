@@ -104,6 +104,18 @@ fun ColorPickerScreen(
                 onValueChange = { viewModel.updateUserColor(uiState.userColor.first, uiState.userColor.second, it) },
                 scaleFactor = scaleFactor
             )
+
+            Spacer(modifier = Modifier.height((64 * scaleFactor).dp))
+
+            // Reset Button
+            Button(
+                onClick = { viewModel.generateNewColor() },
+                modifier = Modifier
+                    .width((200 * scaleFactor).dp)
+                    .height((48 * scaleFactor).dp)
+            ) {
+                Text("Reset", style = MaterialTheme.typography.titleLarge)
+            }
         } else {
             Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
 
