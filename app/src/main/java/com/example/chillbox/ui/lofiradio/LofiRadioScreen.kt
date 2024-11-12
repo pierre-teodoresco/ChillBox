@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +18,7 @@ import androidx.navigation.NavController
 import com.example.chillbox.R
 import com.example.chillbox.utils.TimeManager
 import com.example.chillbox.ui.components.BackButton
+import com.example.chillbox.ui.components.CustomSlider
 
 @Composable
 fun LofiRadioScreen(
@@ -116,13 +116,22 @@ fun LofiRadioScreen(
         }
 
         // Slider for Music Progress
-        Slider(
+//        Slider(
+//            value = uiState.progress.toFloat(),
+//            onValueChange = { viewModel.onSeek(it.toInt()) },
+//            valueRange = 0f..(uiState.currentTrackDuration.toFloat()),
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(horizontal = (32 * scaleFactor).dp)
+//        )
+
+        CustomSlider(
             value = uiState.progress.toFloat(),
             onValueChange = { viewModel.onSeek(it.toInt()) },
             valueRange = 0f..(uiState.currentTrackDuration.toFloat()),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = (32 * scaleFactor).dp)
+                .padding(horizontal = (32 * scaleFactor).dp, vertical = (16 * scaleFactor).dp),
         )
 
         Row(

@@ -1,5 +1,6 @@
 package com.example.chillbox.ui.colorpicker
 
+import com.example.chillbox.ui.components.CustomSlider
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -145,12 +146,18 @@ fun SliderWithColorCircle(
 
         // Slider with value label
         Text("$value", style = MaterialTheme.typography.labelLarge)
-        Slider(
+
+        CustomSlider(
             value = value.toFloat(),
             onValueChange = { onValueChange(it.toInt()) },
             valueRange = 0f..255f,
+            lineColor = color,
+            thumbColor = color,
+            thumbRadius = (16 * scaleFactor).dp,
+            lineHeight = (13 * scaleFactor).dp,
             modifier = Modifier
-                .width((250 * scaleFactor).dp)
+                .width((300 * scaleFactor).dp)
+                .padding((16 * scaleFactor).dp)
         )
     }
 }

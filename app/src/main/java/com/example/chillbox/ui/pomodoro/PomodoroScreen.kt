@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chillbox.R
 import com.example.chillbox.ui.components.BackButton
+import com.example.chillbox.ui.components.CustomSlider
 
 @Composable
 fun PomodoroScreen(
@@ -177,7 +177,7 @@ fun PomodoroScreen(
                 scaleFactor = scaleFactor
             )
 
-            Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height((48 * scaleFactor).dp))
 
             // Short Rest Session Length
             SessionLengthSlider(
@@ -187,7 +187,7 @@ fun PomodoroScreen(
                 scaleFactor = scaleFactor
             )
 
-            Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height((48 * scaleFactor).dp))
 
             // Long Rest Session Length
             SessionLengthSlider(
@@ -212,10 +212,16 @@ fun SessionLengthSlider(
         style = MaterialTheme.typography.bodyMedium.copy(fontSize = (24 * scaleFactor).sp),
         modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
     )
-    Slider(
+    CustomSlider(
         value = length.toFloat(),
-        onValueChange = onValueChange,
+        onValueChange = { it: Float -> onValueChange(it)},
         valueRange = 5f..60f,
-        modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
+        lineColor = MaterialTheme.colorScheme.primary,
+        thumbColor = MaterialTheme.colorScheme.primary,
+        thumbRadius = (16 * scaleFactor).dp,
+        lineHeight = (13 * scaleFactor).dp,
+        modifier = Modifier
+            .width((300 * scaleFactor).dp)
+            .padding((16 * scaleFactor).dp)
     )
 }
