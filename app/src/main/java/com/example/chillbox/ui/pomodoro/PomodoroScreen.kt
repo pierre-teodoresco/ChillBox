@@ -154,7 +154,7 @@ fun PomodoroScreen(
 
             // Skip button
             IconButton(
-                onClick = { viewModel.skipSession() }, // Skip the current session
+                onClick = { viewModel.skipSession(false) }, // Skip the current session
                 modifier = Modifier.padding((8 * scaleFactor).dp)
             ) {
                 Icon(
@@ -215,7 +215,7 @@ fun SessionLengthSlider(
     Slider(
         value = length.toFloat(),
         onValueChange = onValueChange,
-        valueRange = 1f..60f,
+        valueRange = 5f..60f,
         modifier = Modifier.padding(horizontal = (16 * scaleFactor).dp)
     )
 }

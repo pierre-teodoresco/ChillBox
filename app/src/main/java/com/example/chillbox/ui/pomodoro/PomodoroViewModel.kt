@@ -63,7 +63,9 @@ class PomodoroViewModel : ViewModel() {
     // Pause the timer
     fun pauseTimer() {
         _state.update { it.copy(isTimerRunning = false) }
-        timerJob.cancel()
+        if (::timerJob.isInitialized && timerJob.isActive) {
+            timerJob.cancel()
+        }
     }
 
     // Reset the timer to the first work session
@@ -79,14 +81,14 @@ class PomodoroViewModel : ViewModel() {
     }
 
     // Skip the current session
-    fun skipSession() {
+    fun skipSession(autoStart : Boolean = false) {
         pauseTimer()
-        switchSession()
+        switchSession(autoStart)
         updateTimerDisplay()
     }
 
     // Switch between sessions
-    private fun switchSession() {
+    private fun switchSession(autoStart : Boolean = true) {
         // Increment the work session count only when in Work session
         if (_state.value.currentSession == PomodoroSessionType.Work) {
             val updatedScore = _state.value.workSessionCount.inc()
@@ -121,7 +123,10 @@ class PomodoroViewModel : ViewModel() {
                 PomodoroSessionType.LongRest -> _state.value.longRestSessionLength
             } * 60
 
-        startTimer() // Automatically start next session
+        if (autoStart) {
+            // Automatically start next session
+            startTimer()
+        }
     }
 
     // Update timer display in MM:SS format
