@@ -65,7 +65,7 @@ fun PomodoroScreen(
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        Spacer(modifier = Modifier.height((150 * scaleFactor).dp))
+        Spacer(modifier = Modifier.height((120 * scaleFactor).dp))
 
         // Session Type Display (Work Session, Rest Session, Long Rest Session)
         Text(
