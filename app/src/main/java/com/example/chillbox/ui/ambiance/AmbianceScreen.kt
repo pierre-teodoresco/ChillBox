@@ -64,16 +64,27 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
     var relativePosition by remember { mutableStateOf<Rect?>(null) }
     var imageView by remember { mutableStateOf<ImageView?>(null) }
 
+    // Observe changes in the current image
+    val currentImageResId by remember {
+        derivedStateOf {
+            when (viewModel.currentImage.value) {
+                0 -> R.drawable.island_true
+                1 -> R.drawable.mountain
+                else -> R.drawable.island_true
+            }
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         AndroidView(
             factory = { ctx ->
                 ImageView(ctx).apply {
-                    setImageResource(R.drawable.island_true)
                     scaleType = ImageView.ScaleType.CENTER_INSIDE
                 }
             },
             modifier = Modifier.fillMaxSize(),
             update = { view ->
+                view.setImageResource(currentImageResId)
                 imageView = view
                 view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
@@ -95,7 +106,7 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                             val imageWidth = imageBounds.right - imageBounds.left
                             val imageHeight = imageBounds.bottom - imageBounds.top
 
-                            for (ring in viewModel.rings) {
+                            for ((index, ring) in viewModel.rings.withIndex()) {
                                 val ringBounds = getRingBounds(
                                     imageBounds,
                                     imageWidth,
@@ -108,6 +119,9 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
 
                                 if (ringBounds.contains(offset.x.toInt(), offset.y.toInt())) {
                                     viewModel.playSound(context, ring.soundResId)
+                                    if (index == viewModel.rings.size - 1) {
+                                        viewModel.switchImage()
+                                    }
                                     break
                                 }
                             }
@@ -128,70 +142,128 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
 
                     val shadowOffset = 5f // Adjust the shadow offset as needed
 
-                    drawRingWithShadow(
-                        color = Color.Red,
-                        imageBounds = imageBounds,
-                        imageWidth = imageWidth,
-                        imageHeight = imageHeight,
-                        strokeWidth = strokeWidth,
-                        shadowOffset = shadowOffset,
-                        mainRingXPercentage = 0.52f,
-                        mainRingYPercentage = 0.2f,
-                        mainRingWidthPercentage = 0.19f,
-                        mainRingHeightPercentage = 0.27f
-                    )
+                    // Draw those rings if currentImageResId is R.drawable.island_true
+                    if (currentImageResId == R.drawable.island_true) {
 
-                    drawRingWithShadow(
-                        color = Color.Yellow,
-                        imageBounds = imageBounds,
-                        imageWidth = imageWidth,
-                        imageHeight = imageHeight,
-                        strokeWidth = strokeWidth,
-                        shadowOffset = shadowOffset,
-                        mainRingXPercentage = 0.22f,
-                        mainRingYPercentage = 0.35f,
-                        mainRingWidthPercentage = 0.16f,
-                        mainRingHeightPercentage = 0.27f
-                    )
+                        drawRingWithShadow(
+                            color = Color.Red,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.52f,
+                            mainRingYPercentage = 0.2f,
+                            mainRingWidthPercentage = 0.19f,
+                            mainRingHeightPercentage = 0.27f
+                        )
 
-                    drawRingWithShadow(
-                        color = Color.Green,
-                        imageBounds = imageBounds,
-                        imageWidth = imageWidth,
-                        imageHeight = imageHeight,
-                        strokeWidth = strokeWidth,
-                        shadowOffset = shadowOffset,
-                        mainRingXPercentage = 0.35f,
-                        mainRingYPercentage = 0.18f,
-                        mainRingWidthPercentage = 0.16f,
-                        mainRingHeightPercentage = 0.27f
-                    )
+                        drawRingWithShadow(
+                            color = Color.Yellow,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.22f,
+                            mainRingYPercentage = 0.35f,
+                            mainRingWidthPercentage = 0.16f,
+                            mainRingHeightPercentage = 0.27f
+                        )
 
-                    drawRingWithShadow(
-                        color = Color.Cyan,
-                        imageBounds = imageBounds,
-                        imageWidth = imageWidth,
-                        imageHeight = imageHeight,
-                        strokeWidth = strokeWidth,
-                        shadowOffset = shadowOffset,
-                        mainRingXPercentage = 0.20f,
-                        mainRingYPercentage = 0.75f,
-                        mainRingWidthPercentage = 0.3f,
-                        mainRingHeightPercentage = 0.16f
-                    )
+                        drawRingWithShadow(
+                            color = Color.Green,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.35f,
+                            mainRingYPercentage = 0.18f,
+                            mainRingWidthPercentage = 0.16f,
+                            mainRingHeightPercentage = 0.27f
+                        )
 
-                    drawRingWithShadow(
-                        color = Color.Black,
-                        imageBounds = imageBounds,
-                        imageWidth = imageWidth,
-                        imageHeight = imageHeight,
-                        strokeWidth = strokeWidth,
-                        shadowOffset = shadowOffset,
-                        mainRingXPercentage = 0.515f,
-                        mainRingYPercentage = 0.87f,
-                        mainRingWidthPercentage = 0.1f,
-                        mainRingHeightPercentage = 0.1f
-                    )
+                        drawRingWithShadow(
+                            color = Color.Cyan,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.20f,
+                            mainRingYPercentage = 0.75f,
+                            mainRingWidthPercentage = 0.3f,
+                            mainRingHeightPercentage = 0.16f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Black,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.515f,
+                            mainRingYPercentage = 0.87f,
+                            mainRingWidthPercentage = 0.1f,
+                            mainRingHeightPercentage = 0.1f
+                        )
+
+                    } else {
+                        // Draw those rings if currentImageResId is R.drawable.mountain
+                        drawRingWithShadow(
+                            color = Color.Blue,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.4f,
+                            mainRingYPercentage = 0.7f,
+                            mainRingWidthPercentage = 0.35f,
+                            mainRingHeightPercentage = 0.15f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.White,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.42f,
+                            mainRingYPercentage = 0.17f,
+                            mainRingWidthPercentage = 0.12f,
+                            mainRingHeightPercentage = 0.1f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Gray,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.17f,
+                            mainRingYPercentage = 0.52f,
+                            mainRingWidthPercentage = 0.2f,
+                            mainRingHeightPercentage = 0.1f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Red,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.08f,
+                            mainRingYPercentage = 0.75f,
+                            mainRingWidthPercentage = 0.17f,
+                            mainRingHeightPercentage = 0.17f
+                        )
+                    }
                 }
             }
         }
