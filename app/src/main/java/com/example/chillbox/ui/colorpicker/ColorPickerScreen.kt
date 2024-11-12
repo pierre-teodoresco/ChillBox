@@ -112,8 +112,13 @@ fun ColorPickerScreen(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
-            Button(onClick = { viewModel.generateNewColor() }) {
-                Text("Play Again")
+            Button(
+                onClick = { viewModel.generateNewColor() },
+                modifier = Modifier
+                    .width((200 * scaleFactor).dp)
+                    .height((48 * scaleFactor).dp)
+            ) {
+                Text("Play Again", style = MaterialTheme.typography.titleLarge)
             }
         }
     }
@@ -132,7 +137,7 @@ fun SliderWithColorCircle(
         // Color circle label
         Box(
             modifier = Modifier
-                .size((24 * scaleFactor).dp)
+                .size((32 * scaleFactor).dp)
                 .background(color = color, shape = CircleShape)
         )
 
@@ -144,7 +149,8 @@ fun SliderWithColorCircle(
             value = value.toFloat(),
             onValueChange = { onValueChange(it.toInt()) },
             valueRange = 0f..255f,
-            modifier = Modifier.width(250.dp)
+            modifier = Modifier
+                .width((250 * scaleFactor).dp)
         )
     }
 }
