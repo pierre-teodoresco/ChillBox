@@ -25,39 +25,11 @@ class CuteVideosViewModel : ViewModel() {
     }
 
     private fun fetchCuteVideos() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            try {
-                val videos = getYouTubeVideos()
-                _uiState.update { it.copy(videoList = videos, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
-            }
-        }
+        // TODO
     }
 
     private fun getYouTubeVideos(): List<VideoItem> {
-        val url = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoDuration=short" +
-                  "&q=$searchQuery&maxResults=$maxResults&key=$apiKey"
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.requestMethod = "GET"
-
-        val response = connection.inputStream.bufferedReader().use { it.readText() }
-        val jsonResponse = JSONObject(response)
-        val items = jsonResponse.getJSONArray("items")
-
-        val videoList = mutableListOf<VideoItem>()
-        for (i in 0 until items.length()) {
-            val item = items.getJSONObject(i)
-            val videoId = item.getJSONObject("id").getString("videoId")
-            val snippet = item.getJSONObject("snippet")
-            val title = snippet.getString("title")
-            val thumbnailUrl = snippet.getJSONObject("thumbnails").getJSONObject("medium").getString("url")
-            videoList.add(VideoItem(videoId, title, thumbnailUrl))
-        }
-
-        println("videoList: $videoList")
-
-        return videoList
+        // TODO
+        return List(0) { VideoItem("", "", "") }
     }
 }

@@ -1,49 +1,39 @@
 
 package com.example.chillbox.ui.cutevideos
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil3.compose.rememberAsyncImagePainter
+import com.example.chillbox.ui.components.BackButton
 
 @Composable
 fun CuteVideosScreen(
     viewModel: CuteVideosViewModel = viewModel(),
     navController: NavController
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
 
-    if (uiState.isLoading) {
-        CircularProgressIndicator(modifier = Modifier.fillMaxSize())
-    } else if (uiState.errorMessage != null) {
-        Text(text = "Error: ${uiState.errorMessage}", modifier = Modifier.padding(16.dp))
-    } else {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            items(uiState.videoList.size) { index ->
-                val video = uiState.videoList[index]
-                Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                    Image(
-                        painter = rememberAsyncImagePainter(video.thumbnailUrl),
-                        contentDescription = video.title,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
-                    Text(text = video.title, modifier = Modifier.padding(8.dp))
-                }
-            }
+    // Define scaling factor based on screen width (e.g., tablets or large devices)
+    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+
+    //val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding((16 * scaleFactor).dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        // Reusable BackButton from the BackButton.kt file
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+            BackButton(navController = navController, scaleFactor = scaleFactor)
         }
+
     }
 }
