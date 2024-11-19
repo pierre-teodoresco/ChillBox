@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chillbox.ui.ambiance.AmbianceScreen
-import com.example.chillbox.ui.CuteVideosScreen
+import com.example.chillbox.ui.cutevideos.CuteVideosScreen
 import com.example.chillbox.ui.HomeScreen
 import com.example.chillbox.ui.colorpicker.ColorPickerScreen
 import com.example.chillbox.ui.lofiradio.LofiRadioScreen
