@@ -219,10 +219,36 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                             imageHeight = imageHeight,
                             strokeWidth = strokeWidth,
                             shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.55f,
+                            mainRingYPercentage = 0.2f,
+                            mainRingWidthPercentage = 0.22f,
+                            mainRingHeightPercentage = 0.2f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Magenta,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
                             mainRingXPercentage = 0.4f,
-                            mainRingYPercentage = 0.7f,
-                            mainRingWidthPercentage = 0.35f,
-                            mainRingHeightPercentage = 0.15f
+                            mainRingYPercentage = 0.19f,
+                            mainRingWidthPercentage = 0.12f,
+                            mainRingHeightPercentage = 0.1f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Green,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.57f,
+                            mainRingYPercentage = 0.42f,
+                            mainRingWidthPercentage = 0.3f,
+                            mainRingHeightPercentage = 0.2f
                         )
 
                         drawRingWithShadow(
@@ -232,36 +258,10 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                             imageHeight = imageHeight,
                             strokeWidth = strokeWidth,
                             shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.42f,
-                            mainRingYPercentage = 0.17f,
-                            mainRingWidthPercentage = 0.12f,
+                            mainRingXPercentage = 0.63f,
+                            mainRingYPercentage = 0.84f,
+                            mainRingWidthPercentage = 0.1f,
                             mainRingHeightPercentage = 0.1f
-                        )
-
-                        drawRingWithShadow(
-                            color = Color.Gray,
-                            imageBounds = imageBounds,
-                            imageWidth = imageWidth,
-                            imageHeight = imageHeight,
-                            strokeWidth = strokeWidth,
-                            shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.17f,
-                            mainRingYPercentage = 0.52f,
-                            mainRingWidthPercentage = 0.2f,
-                            mainRingHeightPercentage = 0.1f
-                        )
-
-                        drawRingWithShadow(
-                            color = Color.Red,
-                            imageBounds = imageBounds,
-                            imageWidth = imageWidth,
-                            imageHeight = imageHeight,
-                            strokeWidth = strokeWidth,
-                            shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.08f,
-                            mainRingYPercentage = 0.75f,
-                            mainRingWidthPercentage = 0.17f,
-                            mainRingHeightPercentage = 0.17f
                         )
                     }
                 }
