@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +20,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -49,6 +54,17 @@ fun AmbianceScreen(
                 scaleFactor = scaleFactor
             )
         }
+
+        Text(
+            text = "Tap the rings and just relax...",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            fontStyle = FontStyle.Italic, // Add this line to make the text italic
+            textAlign = TextAlign.Center, // Add this line to center the text horizontally
+            modifier = Modifier
+                .fillMaxWidth() // Ensure the text takes up the full width of its parent
+                .padding(vertical = 16.dp)
+        )
 
         // Display the interactive image
         DisplayImage(
