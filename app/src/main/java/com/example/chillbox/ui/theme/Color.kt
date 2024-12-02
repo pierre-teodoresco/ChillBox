@@ -1,10 +1,23 @@
 package com.example.chillbox.ui.theme
 
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-val Blue500 = Color(0xFF2196F3)
-val Blue700 = Color(0xFF1976D2)
-val Blue200 = Color(0xFF90CAF9)
-val Gray50 = Color(0xFFFAFAFA)
-val Gray900 = Color(0xFF212121)
-val Green200 = Color(0xFFA5D6A7)
+val Purple40 = Color(0xFF6650a4)
+val Purple80 = Color(0xFFD0BCFF)
+val PurpleGrey40 = Color(0xFF625b71)
+val PurpleGrey80 = Color(0xFFCCC2DC)
+val Teal40 = Color(0xFF018786)
+
+val DarkColorScheme = darkColorScheme(
+    primary = Purple40,
+    secondary = PurpleGrey40,
+    tertiary = Teal40
+)
+
+val LightColorScheme = lightColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Teal40
+)

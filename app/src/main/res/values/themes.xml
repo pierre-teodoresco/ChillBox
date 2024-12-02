@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here -->
+        <item name="android:textViewStyle">@style/CustomTextViewStyle</item>
+        <item name="android:buttonStyle">@style/CustomButtonStyle</item>
+        <!-- Add other widget styles as needed -->
+    </style>
 
-    <style name="Theme.ChillBox" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Custom TextView Style -->
+    <style name="CustomTextViewStyle" parent="Widget.AppCompat.TextView">
+        <item name="fontFamily">@font/pacifico_regular</item>
+    </style>
+
+    <!-- Custom Button Style -->
+    <style name="CustomButtonStyle" parent="Widget.AppCompat.Button">
+        <item name="fontFamily">@font/pacifico_regular</item>
+    </style>
+
+    <!-- Add other widget styles as needed -->
 </resources>
