@@ -109,8 +109,8 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
 
         Text(
             text = stringResource(id = R.string.app_name),
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (22 * scaleFactor).sp),
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

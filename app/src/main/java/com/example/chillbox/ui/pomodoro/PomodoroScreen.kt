@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +67,7 @@ fun PomodoroScreen(
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        Spacer(modifier = Modifier.height((120 * scaleFactor).dp))
+        Spacer(modifier = Modifier.height((32 * scaleFactor).dp))
 
         // Session Type Display (Work Session, Rest Session, Long Rest Session)
         Text(
@@ -74,16 +76,16 @@ fun PomodoroScreen(
                 PomodoroSessionType.Rest -> "Rest Session"
                 PomodoroSessionType.LongRest -> "Long Rest Session"
             },
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (32 * scaleFactor).sp)
+            style = MaterialTheme.typography.bodyLarge
         )
-
-        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
         // Timer Display (Minutes:Seconds)
         Text(
             text = state.timerValue, // Display timer value as MM:SS
             style = MaterialTheme.typography.titleLarge.copy(fontSize = (64 * scaleFactor).sp),
-            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily(Font(R.font.pacifico_regular)),
+
+
         )
 
         Spacer(modifier = Modifier.height((24 * scaleFactor).dp))

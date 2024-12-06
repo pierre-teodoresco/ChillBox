@@ -40,9 +40,6 @@ fun ColorPickerScreen(
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        val spaceHeight = (if (!uiState.isSuccess) 64 else 200) * scaleFactor
-        Spacer(modifier = Modifier.height((spaceHeight).dp))
-
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
@@ -51,7 +48,7 @@ fun ColorPickerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Target Color Display
-                Text("Match this color", style = MaterialTheme.typography.titleLarge)
+                Text("Match this color", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
                 Box(
                     modifier = Modifier
@@ -69,7 +66,7 @@ fun ColorPickerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // User Color Display
-                Text("Your color", style = MaterialTheme.typography.titleLarge)
+                Text("Your color", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
                 Box(
                     modifier = Modifier
@@ -83,7 +80,6 @@ fun ColorPickerScreen(
         }
 
         if (!uiState.isSuccess) {
-            Spacer(modifier = Modifier.height((64 * scaleFactor).dp))
 
             // RGB Sliders with Colored Circles
             SliderWithColorCircle(
@@ -105,16 +101,14 @@ fun ColorPickerScreen(
                 scaleFactor = scaleFactor
             )
 
-            Spacer(modifier = Modifier.height((64 * scaleFactor).dp))
-
             // Reset Button
             Button(
                 onClick = { viewModel.generateNewColor() },
                 modifier = Modifier
-                    .width((200 * scaleFactor).dp)
+                    .width((150 * scaleFactor).dp)
                     .height((48 * scaleFactor).dp)
             ) {
-                Text("Reset", style = MaterialTheme.typography.titleLarge)
+                Text("Reset", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
             }
         } else {
             Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
@@ -122,7 +116,7 @@ fun ColorPickerScreen(
             Text(
                 "Success! You've matched the color!",
                 color = Color.Black,
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
             Button(
@@ -131,7 +125,7 @@ fun ColorPickerScreen(
                     .width((200 * scaleFactor).dp)
                     .height((48 * scaleFactor).dp)
             ) {
-                Text("Play Again", style = MaterialTheme.typography.titleLarge)
+                Text("Play Again", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
             }
         }
     }

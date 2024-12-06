@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,10 +58,9 @@ fun AmbianceScreen(
 
         Text(
             text = "Tap the rings and just relax...",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            fontStyle = FontStyle.Italic, // Add this line to make the text italic
-            textAlign = TextAlign.Center, // Add this line to center the text horizontally
+            style = MaterialTheme.typography.bodyMedium,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth() // Ensure the text takes up the full width of its parent
                 .padding(vertical = 16.dp)

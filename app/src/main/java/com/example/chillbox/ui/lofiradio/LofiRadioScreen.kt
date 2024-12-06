@@ -51,7 +51,7 @@ fun LofiRadioScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding((16 * scaleFactor).dp),
+            .padding((10 * scaleFactor).dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Back button to home screen
@@ -62,8 +62,6 @@ fun LofiRadioScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
-
         // Song Image with top and bottom padding and rounded corners
         Image(
             painter = painterResource(id = viewModel.getTrackName()),
@@ -72,16 +70,12 @@ fun LofiRadioScreen(
                 .size((500 * scaleFactor).dp) // Use appropriate size
         )
 
-        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
-
         // Song Name with padding
         Text(
             text = viewModel.getTrackTitle(),
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (25 * scaleFactor).sp),
-            modifier = Modifier.padding(vertical = (8 * scaleFactor).dp) // Adjust the padding values as needed
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(vertical = (2 * scaleFactor).dp) // Adjust the padding values as needed
         )
-
-        Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
 
         // Music Player Controls
         Row(
@@ -114,16 +108,6 @@ fun LofiRadioScreen(
                 )
             }
         }
-
-        // Slider for Music Progress
-//        Slider(
-//            value = uiState.progress.toFloat(),
-//            onValueChange = { viewModel.onSeek(it.toInt()) },
-//            valueRange = 0f..(uiState.currentTrackDuration.toFloat()),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = (32 * scaleFactor).dp)
-//        )
 
         CustomSlider(
             value = uiState.progress.toFloat(),

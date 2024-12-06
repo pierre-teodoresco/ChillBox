@@ -57,8 +57,9 @@ fun CubeCarousel(
 
         Text(
             text = "Swipe to see more",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding((28 * scaleFactor).dp),
+            // Use custom typography style
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding((17 * scaleFactor).dp),
         )
 
         // Add right arrow

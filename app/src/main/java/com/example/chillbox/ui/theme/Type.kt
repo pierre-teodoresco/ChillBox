@@ -14,21 +14,14 @@ val CustomTypography = Typography(
             Font(R.font.pacifico_regular)
         ),
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = 42.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily(
             Font(R.font.pacifico_regular)
         ),
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily(
-            Font(R.font.pacifico_regular)
-        ),
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp
+        fontSize = 26.sp
     ),
     bodySmall = TextStyle(
         fontFamily = FontFamily(
@@ -36,5 +29,12 @@ val CustomTypography = Typography(
         ),
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp
-    )
+    ),
+    labelLarge = TextStyle(
+        fontFamily = FontFamily(
+            Font(R.font.pacifico_regular)
+        ),
+        fontWeight = FontWeight.Bold,
+        fontSize = 42.sp
+    ),
 )
