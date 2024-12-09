@@ -39,7 +39,13 @@ fun CuteVideosScreen(
     // Define scaling factor based on screen width (e.g., tablets or large devices)
     val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
 
-    //val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    // Fetch the video list
+    val videos by viewModel.videoList.collectAsState()
+
+    // Keep a reference to the ViewPager2 Adapter
+    val videoPagerAdapter = remember { VideoPagerAdapter(videos, context) }
 
     Column(
         modifier = Modifier
@@ -52,21 +58,17 @@ fun CuteVideosScreen(
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        // Fetch the video list (you can replace this with your own source)
-        val videos by viewModel.videoList.collectAsState()
-
         AndroidView(
             factory = { ctx ->
                 ViewPager2(ctx).apply {
                     orientation = ViewPager2.ORIENTATION_VERTICAL
-                    adapter = VideoPagerAdapter(videos, ctx)
+                    adapter = videoPagerAdapter
                     offscreenPageLimit = 1 // Preload only the next video
 
                     // Handle page change events to control playback
                     registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                         override fun onPageSelected(position: Int) {
                             super.onPageSelected(position)
-                            // Notify the adapter of the visible item change
                             (adapter as? VideoPagerAdapter)?.onPageSelected(position)
                         }
                     })
@@ -74,10 +76,15 @@ fun CuteVideosScreen(
             },
             modifier = Modifier.fillMaxSize()
         )
+    }
 
+    // Clean up resources when the screen is disposed
+    DisposableEffect(Unit) {
+        onDispose {
+            videoPagerAdapter.releaseAllPlayers()
+        }
     }
 }
-
 
 
 class CuteVideosViewModel : ViewModel() {
@@ -96,8 +103,9 @@ class VideoPagerAdapter(private val videoUrls: List<String>, private val context
     RecyclerView.Adapter<VideoPagerAdapter.VideoViewHolder>() {
 
     private var currentPlayingPosition: Int = RecyclerView.NO_POSITION
+    private val activePlayers = mutableListOf<ExoPlayer>()
 
-    class VideoViewHolder(private val playerView: PlayerView) : RecyclerView.ViewHolder(playerView) {
+    class VideoViewHolder(val playerView: PlayerView) : RecyclerView.ViewHolder(playerView) {
         private var player: ExoPlayer? = null
 
         fun bind(videoUrl: String, play: Boolean) {
@@ -132,11 +140,13 @@ class VideoPagerAdapter(private val videoUrls: List<String>, private val context
     override fun onBindViewHolder(holder: VideoViewHolder, position: Int) {
         val shouldPlay = position == currentPlayingPosition
         holder.bind(videoUrls[position], shouldPlay)
+        activePlayers.add(holder.playerView.player as ExoPlayer)
     }
 
     override fun onViewRecycled(holder: VideoViewHolder) {
         super.onViewRecycled(holder)
         holder.release()
+        activePlayers.remove(holder.playerView.player as ExoPlayer)
     }
 
     override fun getItemCount(): Int = videoUrls.size
@@ -150,5 +160,11 @@ class VideoPagerAdapter(private val videoUrls: List<String>, private val context
         // Start the newly selected video
         currentPlayingPosition = position
         notifyItemChanged(position)
+    }
+
+    // Release all players
+    fun releaseAllPlayers() {
+        activePlayers.forEach { it.release() }
+        activePlayers.clear()
     }
 }
