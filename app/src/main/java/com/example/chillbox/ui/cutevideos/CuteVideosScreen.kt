@@ -110,6 +110,7 @@ class CuteVideosViewModel : ViewModel() {
             "android.resource://com.example.chillbox/raw/cat2",
             "android.resource://com.example.chillbox/raw/cat3",
             "android.resource://com.example.chillbox/raw/cat4",
+            "android.resource://com.example.chillbox/raw/cat5"
         )
     )
     val videoList: StateFlow<List<String>> = _videoList
