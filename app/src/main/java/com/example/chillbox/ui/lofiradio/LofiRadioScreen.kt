@@ -1,6 +1,7 @@
 package com.example.chillbox.ui.lofiradio
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +52,7 @@ fun LofiRadioScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.tertiary)
             .padding((10 * scaleFactor).dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

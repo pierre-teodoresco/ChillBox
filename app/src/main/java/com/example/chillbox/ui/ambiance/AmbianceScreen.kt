@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -46,6 +47,7 @@ fun AmbianceScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
             .padding((16 * scaleFactor).dp)
     ) {
         // Back button to home screen
@@ -61,6 +63,7 @@ fun AmbianceScreen(
             style = MaterialTheme.typography.bodyMedium,
             fontStyle = FontStyle.Italic,
             textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
                 .fillMaxWidth() // Ensure the text takes up the full width of its parent
                 .padding(vertical = 16.dp)

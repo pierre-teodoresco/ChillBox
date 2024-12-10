@@ -1,10 +1,10 @@
-
 package com.example.chillbox.ui.cutevideos
 
 import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -64,6 +64,7 @@ fun CuteVideosScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary) // Set the background color
             .padding((16 * scaleFactor).dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -101,7 +102,6 @@ fun CuteVideosScreen(
         }
     }
 }
-
 
 class CuteVideosViewModel : ViewModel() {
     private val _videoList = MutableStateFlow(
@@ -219,6 +219,7 @@ fun CuteTextWithHeart() {
         style = MaterialTheme.typography.bodyMedium,
         fontStyle = FontStyle.Italic,
         textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.secondary,
         inlineContent = inlineContent,
         modifier = Modifier
             .fillMaxWidth()

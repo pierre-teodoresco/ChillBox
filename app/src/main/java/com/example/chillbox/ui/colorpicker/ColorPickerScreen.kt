@@ -108,7 +108,7 @@ fun ColorPickerScreen(
                     .width((150 * scaleFactor).dp)
                     .height((48 * scaleFactor).dp)
             ) {
-                Text("Reset", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text("Reset", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
             }
         } else {
             Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
@@ -125,7 +125,7 @@ fun ColorPickerScreen(
                     .width((200 * scaleFactor).dp)
                     .height((48 * scaleFactor).dp)
             ) {
-                Text("Play Again", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                Text("Play Again", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
             }
         }
     }
