@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -31,12 +32,16 @@ fun CubeCarousel(
     val pagerState = rememberPagerState(pageCount = { items.size })
     val coroutineScope = rememberCoroutineScope()
 
+    val hapticFeedback = LocalHapticFeedback.current
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         // Add left arrow
         IconButton(
             modifier = Modifier
                 .padding((16 * scaleFactor).dp),
             onClick = { // Trigger callback
+                hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+
                 val previousPage = (pagerState.currentPage - 1).coerceAtLeast(0)
                 // Scroll to the previous page
                 coroutineScope.launch {
@@ -52,8 +57,9 @@ fun CubeCarousel(
 
         Text(
             text = "Swipe to see more",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding((28 * scaleFactor).dp),
+            // Use custom typography style
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding((17 * scaleFactor).dp),
         )
 
         // Add right arrow
@@ -61,6 +67,8 @@ fun CubeCarousel(
             modifier = Modifier
                 .padding((16 * scaleFactor).dp),
             onClick = { // Trigger callback
+                hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+
                 val nextPage = (pagerState.currentPage + 1).coerceAtMost(items.size - 1)
                 // Scroll to the next page
                 coroutineScope.launch {
@@ -126,6 +134,8 @@ fun PageIndicator(
     scaleFactor: Float,
     onPageSelected: (Int) -> Unit
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
+
     Row(
         modifier = Modifier
             .padding(top = (8 * scaleFactor).dp)
@@ -142,7 +152,10 @@ fun PageIndicator(
                     .size(size)
                     .padding(horizontal = (4 * scaleFactor).dp)
                     .background(color = color, shape = MaterialTheme.shapes.small)
-                    .clickable { onPageSelected(i) }
+                    .clickable {
+                        hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                        onPageSelected(i)
+                    }
             )
         }
     }
