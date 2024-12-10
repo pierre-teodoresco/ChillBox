@@ -4,17 +4,30 @@ package com.example.chillbox.ui.cutevideos
 import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -27,6 +40,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.chillbox.ui.components.BackButton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.example.chillbox.R
 
 @Composable
 fun CuteVideosScreen(
@@ -57,6 +71,8 @@ fun CuteVideosScreen(
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
+
+        CuteTextWithHeart()
 
         AndroidView(
             factory = { ctx ->
@@ -167,4 +183,45 @@ class VideoPagerAdapter(private val videoUrls: List<String>, private val context
         activePlayers.forEach { it.release() }
         activePlayers.clear()
     }
+}
+
+@Composable
+fun CuteTextWithHeart() {
+    val heartIcon = painterResource(id = R.drawable.ic_heart) // Replace with your heart icon resource
+
+    val annotatedString = buildAnnotatedString {
+        append("Swipe up to see more cute videos! ")
+        // Add a space before the heart icon
+        append(" ")
+        // Add the heart icon after the "videos" term
+        pushStringAnnotation(tag = "heart", annotation = "heart")
+        appendInlineContent("heart", "[heart]")
+        pop()
+    }
+
+    val inlineContent = mapOf(
+        "heart" to InlineTextContent(
+            Placeholder(
+                width = 24.sp,
+                height = 24.sp,
+                placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
+            )
+        ) {
+            Image(
+                painter = heartIcon,
+                contentDescription = null
+            )
+        }
+    )
+
+    Text(
+        text = annotatedString,
+        style = MaterialTheme.typography.bodyMedium,
+        fontStyle = FontStyle.Italic,
+        textAlign = TextAlign.Center,
+        inlineContent = inlineContent,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp)
+    )
 }
