@@ -6,8 +6,11 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,7 +22,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -40,6 +47,7 @@ fun AmbianceScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
             .padding((16 * scaleFactor).dp)
     ) {
         // Back button to home screen
@@ -49,6 +57,17 @@ fun AmbianceScreen(
                 scaleFactor = scaleFactor
             )
         }
+
+        Text(
+            text = "Tap the rings and just relax...",
+            style = MaterialTheme.typography.bodyMedium,
+            fontStyle = FontStyle.Italic,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier
+                .fillMaxWidth() // Ensure the text takes up the full width of its parent
+                .padding(vertical = 16.dp)
+        )
 
         // Display the interactive image
         DisplayImage(
@@ -219,10 +238,36 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                             imageHeight = imageHeight,
                             strokeWidth = strokeWidth,
                             shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.55f,
+                            mainRingYPercentage = 0.2f,
+                            mainRingWidthPercentage = 0.22f,
+                            mainRingHeightPercentage = 0.2f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Magenta,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
                             mainRingXPercentage = 0.4f,
-                            mainRingYPercentage = 0.7f,
-                            mainRingWidthPercentage = 0.35f,
-                            mainRingHeightPercentage = 0.15f
+                            mainRingYPercentage = 0.19f,
+                            mainRingWidthPercentage = 0.12f,
+                            mainRingHeightPercentage = 0.1f
+                        )
+
+                        drawRingWithShadow(
+                            color = Color.Green,
+                            imageBounds = imageBounds,
+                            imageWidth = imageWidth,
+                            imageHeight = imageHeight,
+                            strokeWidth = strokeWidth,
+                            shadowOffset = shadowOffset,
+                            mainRingXPercentage = 0.57f,
+                            mainRingYPercentage = 0.42f,
+                            mainRingWidthPercentage = 0.3f,
+                            mainRingHeightPercentage = 0.2f
                         )
 
                         drawRingWithShadow(
@@ -232,36 +277,10 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                             imageHeight = imageHeight,
                             strokeWidth = strokeWidth,
                             shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.42f,
-                            mainRingYPercentage = 0.17f,
-                            mainRingWidthPercentage = 0.12f,
+                            mainRingXPercentage = 0.63f,
+                            mainRingYPercentage = 0.84f,
+                            mainRingWidthPercentage = 0.1f,
                             mainRingHeightPercentage = 0.1f
-                        )
-
-                        drawRingWithShadow(
-                            color = Color.Gray,
-                            imageBounds = imageBounds,
-                            imageWidth = imageWidth,
-                            imageHeight = imageHeight,
-                            strokeWidth = strokeWidth,
-                            shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.17f,
-                            mainRingYPercentage = 0.52f,
-                            mainRingWidthPercentage = 0.2f,
-                            mainRingHeightPercentage = 0.1f
-                        )
-
-                        drawRingWithShadow(
-                            color = Color.Red,
-                            imageBounds = imageBounds,
-                            imageWidth = imageWidth,
-                            imageHeight = imageHeight,
-                            strokeWidth = strokeWidth,
-                            shadowOffset = shadowOffset,
-                            mainRingXPercentage = 0.08f,
-                            mainRingYPercentage = 0.75f,
-                            mainRingWidthPercentage = 0.17f,
-                            mainRingHeightPercentage = 0.17f
                         )
                     }
                 }

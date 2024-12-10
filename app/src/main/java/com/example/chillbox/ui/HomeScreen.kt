@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,19 +109,25 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
 
         Text(
             text = stringResource(id = R.string.app_name),
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = (22 * scaleFactor).sp),
-            color = MaterialTheme.colorScheme.onPrimary
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
 
 @Composable
 fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Unit) {
+    // Get the haptic feedback instance
+    val hapticFeedback = LocalHapticFeedback.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height((600 * scaleFactor).dp)
-            .clickable { onClick() },
+            .clickable {
+                hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                onClick()
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = (8 * scaleFactor).dp
@@ -165,7 +172,7 @@ fun Footer(modifier: Modifier = Modifier, scaleFactor: Float) {
         Text(
             text = stringResource(id = R.string.footer),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
