@@ -110,7 +110,7 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
         Text(
             text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }
@@ -172,7 +172,7 @@ fun Footer(modifier: Modifier = Modifier, scaleFactor: Float) {
         Text(
             text = stringResource(id = R.string.footer),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.secondary
         )
     }
 }

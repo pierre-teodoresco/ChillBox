@@ -51,8 +51,8 @@ fun PomodoroScreen(
 
     // Background color based on session type
     val backgroundColor = when (state.currentSession) {
-        PomodoroSessionType.Work -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.surfaceVariant
+        PomodoroSessionType.Work -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.tertiary
     }
 
     Column(
@@ -85,8 +85,7 @@ fun PomodoroScreen(
             style = MaterialTheme.typography.titleLarge.copy(fontSize = (64 * scaleFactor).sp),
             fontFamily = FontFamily(Font(R.font.pacifico_regular)),
 
-
-        )
+            )
 
         Spacer(modifier = Modifier.height((24 * scaleFactor).dp))
 
@@ -176,7 +175,8 @@ fun PomodoroScreen(
                 label = "Work",
                 length = state.workSessionLength,
                 onValueChange = { viewModel.setWorkSessionLength(it.toInt()) },
-                scaleFactor = scaleFactor
+                scaleFactor = scaleFactor,
+                currentSessionType = state.currentSession // Pass the current session type
             )
 
             Spacer(modifier = Modifier.height((48 * scaleFactor).dp))
@@ -186,7 +186,8 @@ fun PomodoroScreen(
                 label = "Short Rest",
                 length = state.shortRestSessionLength,
                 onValueChange = { viewModel.setShortRestSessionLength(it.toInt()) },
-                scaleFactor = scaleFactor
+                scaleFactor = scaleFactor,
+                currentSessionType = state.currentSession // Pass the current session type
             )
 
             Spacer(modifier = Modifier.height((48 * scaleFactor).dp))
@@ -196,7 +197,8 @@ fun PomodoroScreen(
                 label = "Long Rest",
                 length = state.longRestSessionLength,
                 onValueChange = { viewModel.setLongRestSessionLength(it.toInt()) },
-                scaleFactor = scaleFactor
+                scaleFactor = scaleFactor,
+                currentSessionType = state.currentSession // Pass the current session type
             )
         }
     }
@@ -207,8 +209,19 @@ fun SessionLengthSlider(
     label: String,
     length: Int,
     onValueChange: (Float) -> Unit,
-    scaleFactor: Float
+    scaleFactor: Float,
+    currentSessionType: PomodoroSessionType // Add current session type parameter
 ) {
+    // Determine the color scheme based on the current session type
+    val lineColor = when (currentSessionType) {
+        PomodoroSessionType.Work -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.primary
+    }
+    val thumbColor = when (currentSessionType) {
+        PomodoroSessionType.Work -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.primary
+    }
+
     Text(
         text = "$label: $length minutes",
         style = MaterialTheme.typography.bodyMedium.copy(fontSize = (24 * scaleFactor).sp),
@@ -216,10 +229,10 @@ fun SessionLengthSlider(
     )
     CustomSlider(
         value = length.toFloat(),
-        onValueChange = { it: Float -> onValueChange(it)},
+        onValueChange = { it: Float -> onValueChange(it) },
         valueRange = 5f..60f,
-        lineColor = MaterialTheme.colorScheme.primary,
-        thumbColor = MaterialTheme.colorScheme.primary,
+        lineColor = lineColor,
+        thumbColor = thumbColor,
         thumbRadius = (16 * scaleFactor).dp,
         lineHeight = (13 * scaleFactor).dp,
         modifier = Modifier
