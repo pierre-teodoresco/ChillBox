@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chillbox.ui.components.BackButton
@@ -24,7 +25,11 @@ fun ColorPickerScreen(
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.7f
+        screenWidthDp < 700 -> 0.9f
+        else -> 1.2f
+    }
 
     // State
     val uiState by viewModel.uiState.collectAsState()
@@ -48,7 +53,12 @@ fun ColorPickerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Target Color Display
-                Text("Match this color", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Match this color",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = (21 * scaleFactor).sp
+                    )
+                )
                 Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
                 Box(
                     modifier = Modifier
@@ -66,7 +76,12 @@ fun ColorPickerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // User Color Display
-                Text("Your color", style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "Your color",
+                    style = MaterialTheme.typography.labelLarge.copy(
+                        fontSize = (21 * scaleFactor).sp
+                    )
+                )
                 Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
                 Box(
                     modifier = Modifier
@@ -101,14 +116,22 @@ fun ColorPickerScreen(
                 scaleFactor = scaleFactor
             )
 
+            Spacer(modifier = Modifier.height((42 * scaleFactor).dp))
+
             // Reset Button
             Button(
                 onClick = { viewModel.generateNewColor() },
                 modifier = Modifier
                     .width((150 * scaleFactor).dp)
-                    .height((48 * scaleFactor).dp)
+                    .height((64 * scaleFactor).dp)
             ) {
-                Text("Reset", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    "Reset",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = (21 * scaleFactor).sp
+                    ),
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         } else {
             Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
@@ -116,16 +139,24 @@ fun ColorPickerScreen(
             Text(
                 "Success! You've matched the color!",
                 color = Color.Black,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontSize = (29 * scaleFactor).sp
+                )
             )
-            Spacer(modifier = Modifier.height((16 * scaleFactor).dp))
+            Spacer(modifier = Modifier.height((128 * scaleFactor).dp))
             Button(
                 onClick = { viewModel.generateNewColor() },
                 modifier = Modifier
                     .width((200 * scaleFactor).dp)
-                    .height((48 * scaleFactor).dp)
+                    .height((64 * scaleFactor).dp)
             ) {
-                Text("Play Again", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.secondary)
+                Text(
+                    "Play Again",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontSize = (21 * scaleFactor).sp
+                    ),
+                    color = MaterialTheme.colorScheme.secondary
+                )
             }
         }
     }
@@ -151,7 +182,12 @@ fun SliderWithColorCircle(
         Spacer(modifier = Modifier.height((8 * scaleFactor).dp))
 
         // Slider with value label
-        Text("$value", style = MaterialTheme.typography.labelLarge)
+        Text(
+            "$value",
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = (21 * scaleFactor).sp
+            )
+        )
 
         CustomSlider(
             value = value.toFloat(),

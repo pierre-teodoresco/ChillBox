@@ -51,7 +51,11 @@ fun CuteVideosScreen(
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.9f
+        screenWidthDp < 700 -> 1.3f
+        else -> 1.0f
+    }
 
     val context = LocalContext.current
 
@@ -73,7 +77,7 @@ fun CuteVideosScreen(
             BackButton(navController = navController, scaleFactor = scaleFactor)
         }
 
-        CuteTextWithHeart()
+        CuteTextWithHeart(scaleFactor = scaleFactor)
 
         AndroidView(
             factory = { ctx ->
@@ -187,7 +191,7 @@ class VideoPagerAdapter(private val videoUrls: List<String>, private val context
 }
 
 @Composable
-fun CuteTextWithHeart() {
+fun CuteTextWithHeart(scaleFactor: Float) {
     val heartIcon = painterResource(id = R.drawable.ic_heart) // Replace with your heart icon resource
 
     val annotatedString = buildAnnotatedString {
@@ -203,8 +207,8 @@ fun CuteTextWithHeart() {
     val inlineContent = mapOf(
         "heart" to InlineTextContent(
             Placeholder(
-                width = 24.sp,
-                height = 24.sp,
+                width = (17 * scaleFactor).sp,
+                height = (17 * scaleFactor).sp,
                 placeholderVerticalAlign = PlaceholderVerticalAlign.AboveBaseline
             )
         ) {
@@ -217,7 +221,7 @@ fun CuteTextWithHeart() {
 
     Text(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodyMedium.copy(fontSize = (17 * scaleFactor).sp),
         fontStyle = FontStyle.Italic,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.secondary,

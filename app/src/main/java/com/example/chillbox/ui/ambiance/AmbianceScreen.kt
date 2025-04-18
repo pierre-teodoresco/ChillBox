@@ -2,6 +2,7 @@ package com.example.chillbox.ui.ambiance
 
 import android.graphics.Rect
 import android.graphics.RectF
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.ImageView
@@ -41,8 +42,13 @@ fun AmbianceScreen(
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
 
+
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.9f
+        screenWidthDp < 700 -> 1.5f
+        else -> 2.0f
+    }
 
     Column(
         modifier = Modifier
@@ -60,7 +66,9 @@ fun AmbianceScreen(
 
         Text(
             text = "Tap the rings and just relax...",
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = (17 * scaleFactor).sp,
+            ),
             fontStyle = FontStyle.Italic,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.secondary,
@@ -72,13 +80,14 @@ fun AmbianceScreen(
         // Display the interactive image
         DisplayImage(
             modifier = Modifier.fillMaxSize(),
-            viewModel = viewModel
+            viewModel = viewModel,
+            scaleFactor = scaleFactor
         )
     }
 }
 
 @Composable
-fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
+fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel, scaleFactor: Float) {
     val context = LocalContext.current
     var relativePosition by remember { mutableStateOf<Rect?>(null) }
     var imageView by remember { mutableStateOf<ImageView?>(null) }
@@ -157,7 +166,7 @@ fun DisplayImage(modifier: Modifier = Modifier, viewModel: AmbianceViewModel) {
                     val imageWidth = imageBounds.right - imageBounds.left
                     val imageHeight = imageBounds.bottom - imageBounds.top
 
-                    val strokeWidth = 17f // Adjust the stroke width as needed
+                    val strokeWidth = 12f*scaleFactor // Adjust the stroke width as needed
 
                     val shadowOffset = 5f // Adjust the shadow offset as needed
 

@@ -38,7 +38,11 @@ fun HomeScreen(navController: NavController) {
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.6f
+        screenWidthDp < 700 -> 0.8f
+        else -> 1.2f
+    }
 
     Column(
         modifier = Modifier
@@ -50,33 +54,33 @@ fun HomeScreen(navController: NavController) {
         Header(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primary),
-            scaleFactor = scaleFactor
+            scaleFactor = 1.2f*scaleFactor
         )
 
         CubeCarousel(
             items = listOf(
                 {
-                    CardItem(R.drawable.lofi_radio, R.string.lofi_radio, scaleFactor) {
+                    CardItem(R.drawable.lofi_radio, R.string.lofi_radio, 2*scaleFactor) {
                         navController.navigate("lofi_radio")
                     }
                 },
                 {
-                    CardItem(R.drawable.pomodoro, R.string.pomodoro, scaleFactor) {
+                    CardItem(R.drawable.pomodoro, R.string.pomodoro, 2*scaleFactor) {
                         navController.navigate("pomodoro")
                     }
                 },
                 {
-                    CardItem(R.drawable.game, R.string.game, scaleFactor) {
+                    CardItem(R.drawable.game, R.string.game, 2*scaleFactor) {
                         navController.navigate("color_picker")
                     }
                 },
                 {
-                    CardItem(R.drawable.ambiance, R.string.ambiance, scaleFactor) {
+                    CardItem(R.drawable.ambiance, R.string.ambiance, 2*scaleFactor) {
                         navController.navigate("ambiance")
                     }
                 },
                 {
-                    CardItem(R.drawable.cute_videos, R.string.cute_videos, scaleFactor) {
+                    CardItem(R.drawable.cute_videos, R.string.cute_videos, 2*scaleFactor) {
                         navController.navigate("cute_videos")
                     }
                 }
@@ -109,7 +113,9 @@ fun Header(modifier: Modifier = Modifier, scaleFactor: Float) {
 
         Text(
             text = stringResource(id = R.string.app_name),
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = (42 * scaleFactor).sp // Adjust the font size using scaleFactor
+            ),
             color = MaterialTheme.colorScheme.secondary
         )
     }
@@ -123,7 +129,7 @@ fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Uni
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height((600 * scaleFactor).dp)
+            .height((300 * scaleFactor).dp) // Adjusted height for better scaling
             .clickable {
                 hapticFeedback.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                 onClick()
@@ -153,7 +159,7 @@ fun CardItem(imageRes: Int, textRes: Int, scaleFactor: Float, onClick: () -> Uni
             )
             Text(
                 text = stringResource(id = textRes),
-                fontSize = (30 * scaleFactor).sp,
+                fontSize = (18 * scaleFactor).sp, // Adjusted font size for better scaling
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.align(Alignment.CenterHorizontally) // Ensure text is centered
             )
@@ -171,7 +177,9 @@ fun Footer(modifier: Modifier = Modifier, scaleFactor: Float) {
     ) {
         Text(
             text = stringResource(id = R.string.footer),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontSize = (42 * scaleFactor).sp // Adjust the font size using scaleFactor
+            ),
             color = MaterialTheme.colorScheme.secondary
         )
     }

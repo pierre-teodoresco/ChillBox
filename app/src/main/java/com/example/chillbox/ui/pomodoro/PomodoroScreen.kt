@@ -44,7 +44,11 @@ fun PomodoroScreen(
     val screenWidthDp = configuration.screenWidthDp
 
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.65f
+        screenWidthDp < 700 -> 1.0f
+        else -> 1.2f
+    }
 
     // State
     val state by viewModel.state.collectAsState()

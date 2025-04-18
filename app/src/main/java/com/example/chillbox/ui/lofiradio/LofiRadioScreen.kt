@@ -28,8 +28,13 @@ fun LofiRadioScreen(
 ) {
     val configuration = LocalConfiguration.current
     val screenWidthDp = configuration.screenWidthDp
+
     // Define scaling factor based on screen width (e.g., tablets or large devices)
-    val scaleFactor = if (screenWidthDp > 600) 2.0f else 1.0f
+    val scaleFactor = when {
+        screenWidthDp < 400 -> 0.6f
+        screenWidthDp < 700 -> 0.8f
+        else -> 1.2f
+    }
 
     // Context
     val context = LocalContext.current
@@ -53,14 +58,24 @@ fun LofiRadioScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.tertiary)
-            .padding((10 * scaleFactor).dp),
+            .padding(
+                start = (10 * scaleFactor).dp,
+                top = (64 * scaleFactor).dp,
+                end = (10 * scaleFactor).dp,
+                bottom = (64 * scaleFactor).dp
+            ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Back button to home screen
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopStart) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding((16 * scaleFactor).dp),
+            contentAlignment = Alignment.TopStart
+        ) {
             BackButton(
                 navController = navController,
-                scaleFactor = scaleFactor
+                scaleFactor = 0.7f*scaleFactor
             )
         }
 
@@ -75,7 +90,9 @@ fun LofiRadioScreen(
         // Song Name with padding
         Text(
             text = viewModel.getTrackTitle(),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontSize = (42 * scaleFactor).sp // Adjust the font size using scaleFactor
+            ),
             modifier = Modifier.padding(vertical = (2 * scaleFactor).dp) // Adjust the padding values as needed
         )
 
@@ -117,7 +134,7 @@ fun LofiRadioScreen(
             valueRange = 0f..(uiState.currentTrackDuration.toFloat()),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = (32 * scaleFactor).dp, vertical = (16 * scaleFactor).dp),
+                .padding(horizontal = (64 * scaleFactor).dp, vertical = (16 * scaleFactor).dp),
         )
 
         Row(
@@ -126,8 +143,14 @@ fun LofiRadioScreen(
                 .padding(horizontal = (32 * scaleFactor).dp), // Adjust horizontal padding to shrink the slider
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = TimeManager.formatTime(uiState.progress / 1000))
-            Text(text = TimeManager.formatTime(uiState.currentTrackDuration / 1000))
+            Text(
+                text = TimeManager.formatTime(uiState.progress / 1000),
+                fontSize = (32 * scaleFactor).sp
+            )
+            Text(
+                text = TimeManager.formatTime(uiState.currentTrackDuration / 1000),
+                fontSize = (32 * scaleFactor).sp
+            )
         }
     }
 }
